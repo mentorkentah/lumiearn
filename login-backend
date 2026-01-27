@@ -1,0 +1,330 @@
+Welcome to Termux!
+
+Docs:       https://termux.dev/docs
+Donate:     https://termux.dev/donate
+Community:  https://termux.dev/community
+
+Working with packages:
+
+ - Search:  pkg search <query>
+ - Install: pkg install <package>
+ - Upgrade: pkg upgrade
+
+Subscribing to additional repositories:
+
+ - Root:    pkg install root-repo
+ - X11:     pkg install x11-repo
+
+For fixing any repository issues,
+try 'termux-change-repo' command.
+
+Report issues at https://termux.dev/issues
+~/lumiearn-backend $ pkg install nodejs
+No mirror or mirror group selected. You might want to select one by running 'termux-change-repo'
+Checking availability of current mirror:
+[*] https://packages-cf.termux.dev/apt/termux-main/: ok
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+nodejs is already the newest version (25.3.0).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+~/lumiearn-backend $ npm init -y
+Wrote to /data/data/com.termux/files/home/lumiearn-backend/package.json:
+
+{
+  "name": "lumiearn-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {}
+}
+
+
+
+~/lumiearn-backend $ npm install express cors body-parser bcrypt jsonwebtokenconst express = require("express");
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $ const cors = require("cors");
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $ const bodyParser = require("body-parser");
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $ const bcrypt = require("bcrypt");
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $ const jwt = require("jsonwebtoken");
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $
+~/lumiearn-backend $ const app = express();
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $ const PORT = 5000; // Your backend port
+No command const found, did you mean:
+ Command cpnt in package chntpw
+ Command ctest in package cmake
+ Command host in package dnsutils
+ Command dunst in package dunst from the x11-repo repository
+ Command gost in package gost
+ Command count in package llvm-tools
+ Command most in package most
+ Command chpst in package runit
+bash: //: Is a directory
+~/lumiearn-backend $
+~/lumiearn-backend $ app.use(cors());
+bash: syntax error near unexpected token `cors'
+~/lumiearn-backend $ app.use(bodyParser.json());
+bash: syntax error near unexpected token `bodyParser.json'
+~/lumiearn-backend $
+~/lumiearn-backend $ // Fake "database"
+bash: //: Is a directory
+~/lumiearn-backend $ let users = [];
+bash: let: =: arithmetic syntax error: operand expected (error token is "=")
+~/lumiearn-backend $
+~/lumiearn-backend $ // Secret key for JWT
+bash: //: Is a directory
+~/lumiearn-backend $ const SECRET_KEY = "lumiearn_secret_key";
+No command const found, did you mean:
+ Command cpnt in package chntpw
+ Command ctest in package cmake
+ Command host in package dnsutils
+ Command dunst in package dunst from the x11-repo repository
+ Command gost in package gost
+ Command count in package llvm-tools
+ Command most in package most
+ Command chpst in package runit
+~/lumiearn-backend $
+~/lumiearn-backend $ // ----- REGISTER -----
+bash: //: Is a directory
+~/lumiearn-backend $ app.post("/register", async (req, res) => {
+bash: syntax error near unexpected token `"/register",'
+~/lumiearn-backend $   const { username, email, password } = req.body;
+No command const found, did you mean:
+ Command cpnt in package chntpw
+ Command ctest in package cmake
+ Command host in package dnsutils
+ Command dunst in package dunst from the x11-repo repository
+ Command gost in package gost
+ Command count in package llvm-tools
+ Command most in package most
+ Command chpst in package runit
+~/lumiearn-backend $
+~/lumiearn-backend $   // Check if user exists
+bash: //: Is a directory
+~/lumiearn-backend $   const userExists = users.find(u => u.username === username || u.email === email);
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $   if (userExists) {
+bash: syntax error near unexpected token `{'
+~/lumiearn-backend $     return res.status(400).json({ message: "Username or email already exists" });
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $   }
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $
+~/lumiearn-backend $   // Hash password
+bash: //: Is a directory
+~/lumiearn-backend $   const hashedPassword = await bcrypt.hash(password, 10);
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $
+~/lumiearn-backend $   // Store user
+bash: //: Is a directory
+~/lumiearn-backend $   const newUser = { id: users.length + 1, username, email, password: hashedPassword };
+No command const found, did you mean:
+ Command cpnt in package chntpw
+ Command ctest in package cmake
+ Command host in package dnsutils
+ Command dunst in package dunst from the x11-repo repository
+ Command gost in package gost
+ Command count in package llvm-tools
+ Command most in package most
+ Command chpst in package runit
+~/lumiearn-backend $   users.push(newUser);
+bash: syntax error near unexpected token `newUser'
+~/lumiearn-backend $
+~/lumiearn-backend $   res.json({ message: "User registered successfully" });
+bash: syntax error near unexpected token `{'
+~/lumiearn-backend $ });
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $
+~/lumiearn-backend $ // ----- LOGIN -----
+bash: //: Is a directory
+~/lumiearn-backend $ app.post("/login", async (req, res) => {
+bash: syntax error near unexpected token `"/login",'
+~/lumiearn-backend $   const { usernameOrEmail, password } = req.body;
+No command const found, did you mean:
+ Command cpnt in package chntpw
+ Command ctest in package cmake
+ Command host in package dnsutils
+ Command dunst in package dunst from the x11-repo repository
+ Command gost in package gost
+ Command count in package llvm-tools
+ Command most in package most
+ Command chpst in package runit
+~/lumiearn-backend $
+~/lumiearn-backend $   // Find user
+bash: //: Is a directory
+~/lumiearn-backend $   const user = users.find(u => u.username === usernameOrEmail || u.email === usernameOrEmail);
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $   if (!user) return res.status(404).json({ message: "User not found" });
+bash: !user: event not found
+~/lumiearn-backend $
+~/lumiearn-backend $   // Check password
+bash: //: Is a directory
+~/lumiearn-backend $   const validPassword = await bcrypt.compare(password, user.password);
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $   if (!validPassword) return res.status(400).json({ message: "Incorrect password" });
+bash: !validPassword: event not found
+~/lumiearn-backend $
+~/lumiearn-backend $   // Create JWT token
+bash: //: Is a directory
+~/lumiearn-backend $   const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: "1h" });
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $
+~/lumiearn-backend $   res.json({ message: "Login successful", token });
+bash: syntax error near unexpected token `{'
+~/lumiearn-backend $ });
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $
+~/lumiearn-backend $ // ----- RESET PASSWORD -----
+bash: //: Is a directory
+~/lumiearn-backend $ app.post("/reset-password", async (req, res) => {
+bash: syntax error near unexpected token `"/reset-password",'
+~/lumiearn-backend $   const { email, newPassword } = req.body;
+No command const found, did you mean:
+ Command cpnt in package chntpw
+ Command ctest in package cmake
+ Command host in package dnsutils
+ Command dunst in package dunst from the x11-repo repository
+ Command gost in package gost
+ Command count in package llvm-tools
+ Command most in package most
+ Command chpst in package runit
+~/lumiearn-backend $
+~/lumiearn-backend $   const user = users.find(u => u.email === email);
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $   if (!user) return res.status(404).json({ message: "Email not found" });
+bash: !user: event not found
+~/lumiearn-backend $
+~/lumiearn-backend $   const hashedPassword = await bcrypt.hash(newPassword, 10);
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $   user.password = hashedPassword;
+user.password: command not found
+~/lumiearn-backend $
+~/lumiearn-backend $   res.json({ message: "Password reset successful" });
+bash: syntax error near unexpected token `{'
+~/lumiearn-backend $ });
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $
+~/lumiearn-backend $ // ----- PROTECTED ROUTE EXAMPLE -----
+bash: //: Is a directory
+~/lumiearn-backend $ app.get("/dashboard", (req, res) => {
+bash: syntax error near unexpected token `"/dashboard",'
+~/lumiearn-backend $   const authHeader = req.headers.authorization;
+No command const found, did you mean:
+ Command cpnt in package chntpw
+ Command ctest in package cmake
+ Command host in package dnsutils
+ Command dunst in package dunst from the x11-repo repository
+ Command gost in package gost
+ Command count in package llvm-tools
+ Command most in package most
+ Command chpst in package runit
+~/lumiearn-backend $   if (!authHeader) return res.status(401).json({ message: "No token provided" });
+bash: !authHeader: event not found
+~/lumiearn-backend $
+~/lumiearn-backend $   const token = authHeader.split(" ")[1];
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $
+~/lumiearn-backend $   try {
+No command try found, did you mean:
+ Command tr in package coreutils
+ Command tri in package mesa-demos from the x11-repo repository
+ Command trz in package trzsz-go
+~/lumiearn-backend $     const decoded = jwt.verify(token, SECRET_KEY);
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $     res.json({ message: `Welcome ${decoded.username}!` });
+bash: !`: event not found
+~/lumiearn-backend $   } catch (err) {
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $     res.status(401).json({ message: "Invalid token" });
+bash: syntax error near unexpected token `401'
+~/lumiearn-backend $   }
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $ });
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $
+~/lumiearn-backend $ app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));loginForm.addEventListener("submit", async function(e){
+bash: syntax error near unexpected token `PORT,'
+~/lumiearn-backend $   e.preventDefault();
+bash: syntax error near unexpected token `;'
+~/lumiearn-backend $
+~/lumiearn-backend $   const input = document.getElementById("username").value.trim();
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $   const passwordValue = document.getElementById("password").value;
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $
+~/lumiearn-backend $   try {
+No command try found, did you mean:
+ Command tr in package coreutils
+ Command tri in package mesa-demos from the x11-repo repository
+ Command trz in package trzsz-go
+~/lumiearn-backend $     const response = await fetch("http://localhost:5000/login", {
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $       method: "POST",
+No command method: found, did you mean:
+ Command nethogs in package nethogs from the root-repo repository
+~/lumiearn-backend $       headers: { "Content-Type": "application/json" },
+headers:: command not found
+~/lumiearn-backend $       body: JSON.stringify({ usernameOrEmail: input, password: passwordValue })
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $     });
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $
+~/lumiearn-backend $     const data = await response.json();
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $
+~/lumiearn-backend $     if (!response.ok) throw new Error(data.message);
+bash: !response.ok: event not found
+~/lumiearn-backend $
+~/lumiearn-backend $     alertBox.style.display = "block";
+alertBox.style.display: command not found
+~/lumiearn-backend $     alertBox.style.background = "#d4edda";
+alertBox.style.background: command not found
+~/lumiearn-backend $     alertBox.style.color = "#155724";
+alertBox.style.color: command not found
+~/lumiearn-backend $     alertBox.innerText = data.message;
+alertBox.innerText: command not found
+~/lumiearn-backend $
+~/lumiearn-backend $     // Save token to localStorage
+bash: //: Is a directory
+~/lumiearn-backend $     localStorage.setItem("LUMIEARN_TOKEN", data.token);
+bash: syntax error near unexpected token `"LUMIEARN_TOKEN",'
+~/lumiearn-backend $
+~/lumiearn-backend $     setTimeout(() => {
+bash: syntax error near unexpected token `('
+~/lumiearn-backend $       window.location.replace("http://localhost:8158/lumiearn-pay.html");
+bash: syntax error near unexpected token `"http://localhost:8158/lumiearn-pay.html"'
+~/lumiearn-backend $     }, 1500);
+bash: syntax error near unexpected token `)'
+~/lumiearn-backend $
+~/lumiearn-backend $   } catch (err) {
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $     alertBox.style.display = "block";
+alertBox.style.display: command not found
+~/lumiearn-backend $     alertBox.style.background = "#f8d7da";
+alertBox.style.background: command not found
+~/lumiearn-backend $     alertBox.style.color = "#721c24";
+alertBox.style.color: command not found
+~/lumiearn-backend $     alertBox.innerText = err.message;
+alertBox.innerText: command not found
+~/lumiearn-backend $   }
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $ });cat server.jspkg install termux-apitermux-clipboard-set < server.jstermux-setup-storagecp server.js ~/storage/shared/server.jsInternal Storage/server.js
+bash: syntax error near unexpected token `}'
+~/lumiearn-backend $
