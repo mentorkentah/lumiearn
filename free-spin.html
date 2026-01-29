@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Free Spin</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+
+/* DARK MODE */
+body.dark{
+  --bg:#0a0a0f;
+  --sidebar:#111118;
+  --text:#ffffff;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:250px;background:var(--sidebar);position:fixed;left:-250px;top:0;height:100%;padding:20px;transition:.3s;z-index:1000;}
+.sidebar.active{left:0;}
+.sidebar h2{text-align:center;margin-bottom:25px;color:var(--accent);}
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;cursor:pointer;}
+.menu-item:hover{background:rgba(0,0,0,.05);}
+.menu-left{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);}
+.submenu{display:none;flex-direction:column;padding-left:28px;}
+.submenu a{text-decoration:none;color:var(--accent);padding:6px 0;font-size:14px;}
+.menu-item a.active,
+.menu-item.open>.menu-left{background:rgba(0,207,200,.15);border-left:10px solid var(--accent);border-radius:0 10px 10px 0;}
+
+/* MAIN */
+.main{padding:20px;margin-left:0;}
+
+/* HEADER BAR */
+.header{display:flex;align-items:center;justify-content:space-between;background:#fff;padding:12px 16px;border-radius:14px;margin-bottom:25px;box-shadow:0 6px 18px rgba(0,0,0,.08);border-left:4px solid var(--accent);}
+.menu-toggle{width:38px;height:38px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.menu-toggle span{width:18px;height:2px;background:#000;position:absolute;transition:.3s;}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+.mode-btn{background:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
+
+/* SPIN CONTAINER */
+.container{
+  background:#fff;
+  max-width:400px;
+  width:100%;
+  padding:20px;
+  border-radius:10px;
+  text-align:center;
+  box-shadow:0 6px 18px rgba(0,0,0,.1);
+  margin:auto;
+}
+.wheel-container{
+  position:relative;
+  width:320px;
+  height:320px;
+  margin:20px auto;
+}
+canvas{
+  border-radius:50%;
+  border:8px solid #facc15;
+}
+.center{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:70px;
+  height:70px;
+  background:gold;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:30px;
+  color:#fff;
+  cursor:pointer;
+  z-index:5;
+}
+.arrow{
+  position:absolute;
+  top:-15px;
+  left:50%;
+  transform:translateX(-50%) rotate(180deg);
+  width:0;
+  height:0;
+  border-left:15px solid transparent;
+  border-right:15px solid transparent;
+  border-bottom:30px solid gold;
+}
+#spinBtn{
+  padding:12px 30px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(45deg,#6a4dfd,#2b3350);
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
+}
+.win-notification{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%) translateY(-20px);
+  background:#22c55e;
+  color:#fff;
+  padding:15px 20px;
+  width:50%;
+  max-width:500px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  opacity:0;
+  transition:.4s;
+  z-index:1000;
+}
+.win-notification.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.win-notification i{
+  margin-left:auto;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h2>LUMIEARN</h2>
+  <div class="menu-item">
+    <a href="dashboard.html" class="menu-left"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+  </div>
+  <div class="menu-item has-sub" id="tasksBtn">
+    <div class="menu-left"><i class="fa-solid fa-list-check"></i><span>Tasks</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Task List</a>
+    <a href="completed-tasks.html">Completed Tasks</a>
+  </div>
+  <div class="menu-item has-sub" id="spinBtnMenu">
+    <div class="menu-left"><i class="fa-solid fa-dice"></i><span>Spin</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="free-spin.html">Free Spin</a>
+    <a href="casino-spin.html">Casino</a>
+  </div>
+  <div class="menu-item has-sub" id="depositBtn">
+    <div class="menu-left"><i class="fa-solid fa-credit-card"></i><span>Deposit</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="deposit.html">Deposit Funds</a>
+  </div>
+  <div class="menu-item has-sub" id="accountBtn">
+    <div class="menu-left"><i class="fa-regular fa-user"></i><span>Account</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="profile.html">Profile</a>
+    <a href="security.html">Security</a>
+  </div>
+  <div class="menu-item">
+    <a href="withdrawals.html" class="menu-left"><i class="fa-solid fa-hand-holding-dollar"></i><span>Withdrawals</span></a>
+  </div>
+  <div class="menu-item">
+    <a href="log.html" class="menu-left"><i class="fa-solid fa-power-off"></i><span>Logout</span></a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+    <strong>LUMIEARN</strong>
+    <button class="mode-btn" id="modeBtn"><i class="fa-solid fa-moon"></i></button>
+  </div>
+
+  <div class="container">
+    <h2>Free Spin</h2>
+
+    <div class="wheel-container">
+      <canvas id="wheel" width="320" height="320"></canvas>
+      <div class="center" id="diceBtn"><i class="fa-solid fa-dice"></i></div>
+      <div class="arrow"></div>
+    </div>
+
+    <button id="spinBtn">SPIN</button>
+  </div>
+
+</div>
+
+<div class="win-notification" id="winNotification">
+  <span id="winMessage"></span>
+  <i class="fa-solid fa-xmark" id="closeWin"></i>
+</div>
+
+<script>
+/* ================= SIDEBAR TOGGLE ================= */
+const menuToggle = document.getElementById("menuToggle");
+const sidebar = document.getElementById("sidebar");
+menuToggle.onclick = () => {
+  sidebar.classList.toggle("active");
+  menuToggle.classList.toggle("active");
+};
+document.addEventListener("click", e => {
+  if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+    sidebar.classList.remove("active");
+    menuToggle.classList.remove("active");
+  }
+});
+
+/* --- SUBMENU TOGGLE --- */
+const submenuButtons = document.querySelectorAll(".menu-item.has-sub");
+submenuButtons.forEach(btn => {
+  btn.addEventListener("click", e => {
+    if (e.target.tagName.toLowerCase() !== 'a') {
+      e.preventDefault();
+      submenuButtons.forEach(other => {
+        if (other !== btn) {
+          other.classList.remove("open");
+          if (other.nextElementSibling && other.nextElementSibling.classList.contains("submenu")) {
+            other.nextElementSibling.style.display = "none";
+          }
+        }
+      });
+      btn.classList.toggle("open");
+      const submenu = btn.nextElementSibling;
+      if (submenu && submenu.classList.contains("submenu")) {
+        submenu.style.display = submenu.style.display === "flex" ? "none" : "flex";
+      }
+    }
+  });
+});
+
+/* --- DARK MODE --- */
+document.getElementById("modeBtn").onclick = () => {
+  document.body.classList.toggle("dark");
+};
+
+/* ================= USER & SPIN ================= */
+const BASE_CURRENCY = "USD";
+const EXCHANGE_RATES = { USD:1, KSH:155, UGX:3900, TZS:2550 };
+const COUNTRY_CONFIG = { KE:{currency:"KSH"}, UG:{currency:"UGX"}, TZ:{currency:"TZS"}, US:{currency:"USD"} };
+const BASE_SPIN_PRIZES = [0,0,0,0,0,0.01,0.02,0.05,0.1,0.2];
+const DISPLAY_LABELS = ["X2","X5","X10","X20","X50","X5","X10","X20","X50","X100"];
+const COLORS = ["#0f172a","#22c55e","#3b82f6","#10b981","#16a34a","#2563eb","#9333ea","#1e293b","#84cc16","#f97316"];
+
+const username = localStorage.getItem("LUMIEARN_LOGGED_IN") || "User";
+const countryCode = localStorage.getItem(`country_${username}`) || "US";
+const currency = countryCode === "US" ? "USD" : COUNTRY_CONFIG[countryCode].currency;
+const rate = EXCHANGE_RATES[currency];
+
+let wallet = JSON.parse(localStorage.getItem(`wallet_${username}`)) || { balance:0, profit:0 };
+let hasSpun = localStorage.getItem(`hasSpun_${username}`) === "true";
+
+function formatCurrency(amount, currency){
+  const options = { style:"currency", currency:currency, currencyDisplay:"code", minimumFractionDigits:currency==="USD"?2:0, maximumFractionDigits:currency==="USD"?2:0 };
+  return new Intl.NumberFormat(undefined, options).format(amount);
+}
+
+/* ================= WHEEL ================= */
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+let angle = 0;
+let spinning = false;
+
+function drawWheel(){
+  const slice = 2*Math.PI/BASE_SPIN_PRIZES.length;
+  ctx.clearRect(0,0,320,320);
+  BASE_SPIN_PRIZES.forEach((_,i)=>{
+    ctx.beginPath();
+    ctx.fillStyle = COLORS[i];
+    ctx.moveTo(160,160);
+    ctx.arc(160,160,160,angle+i*slice,angle+(i+1)*slice);
+    ctx.fill();
+    ctx.save();
+    ctx.translate(160,160);
+    ctx.rotate(angle+i*slice+slice/2);
+    ctx.fillStyle="#fff";
+    ctx.font="bold 14px Arial";
+    ctx.textAlign="right";
+    ctx.fillText(DISPLAY_LABELS[i],140,5);
+    ctx.restore();
+  });
+}
+
+function spinWheel(){
+  if(spinning || hasSpun){ alert("Free spin is always done once."); return; }
+  spinning = true;
+  const target = Math.random()<0.7 ? Math.floor(Math.random()*5) : 5+Math.floor(Math.random()*5);
+  const slice = 2*Math.PI/BASE_SPIN_PRIZES.length;
+  const targetAngle = 6*2*Math.PI + target*slice;
+  const start = performance.now();
+  const duration = 4000;
+
+  function animate(t){
+    const p = Math.min((t-start)/duration,1);
+    angle = targetAngle * (1-Math.pow(1-p,3));
+    drawWheel();
+    if(p<1) requestAnimationFrame(animate);
+    else finishSpin(target);
+  }
+  requestAnimationFrame(animate);
+}
+
+function finishSpin(index){
+  spinning=false;
+  hasSpun=true;
+  localStorage.setItem(`hasSpun_${username}`,"true");
+  const winUSD = BASE_SPIN_PRIZES[index];
+  const winLocal = +(winUSD*rate).toFixed(2);
+  wallet.balance += winLocal;
+  wallet.profit += winLocal;
+  localStorage.setItem(`wallet_${username}`,JSON.stringify(wallet));
+  document.getElementById("winMessage").innerHTML = `Congratulations <b>${username}</b>! You won <b>${formatCurrency(winLocal,currency)}</b>`;
+  const popup = document.getElementById("winNotification");
+  popup.classList.add("show");
+  setTimeout(()=>location.href="dashboard.html",4000);
+  document.getElementById("closeWin").onclick = ()=>{
+    popup.classList.remove("show");
+    location.href="dashboard.html";
+  };
+}
+
+drawWheel();
+document.getElementById("spinBtn").onclick=spinWheel;
+document.getElementById("diceBtn").onclick=spinWheel;
+</script>
+
+</body>
+
+<title>Footer at Bottom</title>
+<style>
+  /* Make the whole page a flex container in column direction */
+  html, body {
+    height: 100%;           /* Important to make body take full viewport height */
+    margin: 0;              /* Remove default margin */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Main content grows to fill space */
+  main {
+    flex: 1;
+  }
+
+  footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    background: #f1f1f1; /* Optional background */
+  }
+
+  footer a {
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+<main>
+</main>
+
+<footer>
+  Copyright © 2026 <strong>
+    <a href="#" target="_blank" style="color:inherit;">
+      LUMIEARN
+    </a>
+  </strong>.  
+  Designed with ❤️ by <strong>
+    <a href="https://besttech.com" target="_blank" style="color:#4da6ff;">
+      BestChoice Management
+    </a>
+  </strong>.  
+  All rights reserved.
+</footer>
+
+</body>
+</html>
+</html>

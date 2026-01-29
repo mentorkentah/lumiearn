@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | LUMIEARN</title>
+
+<!-- Orbitron Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  overflow-x:hidden;
+  font-family:'Orbitron',sans-serif;
+  background:#0a0a0f;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.login-card{
+  background:#111118;
+  padding:34px 30px;
+  border-radius:16px;
+  width:100%;
+  max-width:400px;
+  box-sizing:border-box;
+  box-shadow:0 0 20px rgba(0,255,240,.25);
+}
+
+.brand{
+  text-align:center;
+  margin-bottom:12px;
+}
+
+.brand h1{
+  color:#00fff0;
+  font-size:34px;
+  margin:0;
+}
+
+.brand p{
+  color:#0ff;
+  opacity:.8;
+  font-size:15px;
+  margin-top:4px;
+}
+
+#alertBox{
+  display:none;
+  margin-bottom:12px;
+  padding:8px 12px;
+  border-radius:12px;
+  font-size:14px;
+  text-align:center;
+}
+
+.form-group{margin-bottom:18px;}
+
+label{
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:8px;
+  display:block;
+  color:#0ff;
+}
+
+.input-box{position:relative;width:100%;}
+
+.input-box i{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:16px;
+  color:#0ff;
+}
+
+.input-box i:first-child{left:16px;}
+.toggle-password{right:16px;cursor:pointer;}
+
+.input-box input{
+  width:100%;
+  height:54px;
+  padding:0 44px;
+  font-size:15px;
+  border-radius:14px;
+  border:1px solid rgba(0,255,240,.4);
+  background:transparent;
+  color:#fff;
+  box-sizing:border-box;
+}
+
+/* Autofill fix for Chrome, Edge */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px #111118 inset !important;
+    -webkit-text-fill-color: #fff !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Autofill fix for Firefox */
+input:-moz-autofill {
+    box-shadow: 0 0 0px 1000px #111118 inset !important;
+    -moz-text-fill-color: #fff !important;
+}
+
+.input-box input:focus{
+  outline:none;
+  border-color:#0ff;
+  box-shadow:0 0 12px rgba(0,255,240,.35);
+}
+
+.btn{
+  width:100%;
+  height:54px;
+  border:none;
+  border-radius:16px;
+  background:#00fff0;
+  color:#0a0a0f;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.3s;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-decoration:none;
+}
+
+.btn:hover{
+  box-shadow:0 0 20px rgba(0,255,240,.6);
+}
+
+.links{
+  margin-top:20px;
+  text-align:center;
+  font-size:14px;
+  color:#fff;
+}
+
+.links a{
+  color:#00fff0;
+  font-weight:700;
+  text-decoration:none;
+}
+
+.links a:hover{
+  text-decoration:underline;
+}
+
+@media(max-width:400px){
+  .login-card{width:95%; padding:34px 30px;}
+  .brand h1{font-size:28px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+  <div class="brand">
+    <h1>LUMIEARN | Login</h1>
+    <p>Welcome back, login to continue</p>
+    <div id="alertBox"></div>
+  </div>
+
+<form id="loginForm">
+  <div class="form-group">
+    <label>Username or Email</label>
+    <div class="input-box">
+      <i class="fa-solid fa-user"></i>
+      <input type="text" id="loginId" placeholder="Enter username or email" required autocomplete="username">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Password</label>
+    <div class="input-box">
+      <i class="fa-solid fa-lock"></i>
+      <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+      <i class="fa-solid fa-eye toggle-password"></i>
+    </div>
+  </div>
+
+  <button class="btn" type="submit">Login</button>
+</form>
+
+<div class="links">
+  <a href="pass-reset.html">Forgot password?</a><br><br>
+  Don’t have an account? <a href="reg.html">Click here</a>
+</div>
+</div>
+
+<script>
+const loginId = document.getElementById("loginId");
+const password = document.getElementById("password");
+const alertBox = document.getElementById("alertBox");
+
+document.getElementById("loginForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const id = loginId.value.trim().toLowerCase();
+  const pass = password.value;
+  let foundUser = null;
+
+  for (let k in localStorage) {
+    if (k.startsWith("LUMIEARN_USER_")) {
+      const u = JSON.parse(localStorage.getItem(k));
+      if (u.username.toLowerCase() === id || u.email === id) {
+        foundUser = u;
+        break;
+      }
+    }
+  }
+
+  if (!foundUser) return showAlert("Account not found", "error");
+  if (foundUser.password !== pass) return showAlert("Incorrect password", "error");
+
+  localStorage.setItem("LUMIEARN_LOGGED_IN", foundUser.username);
+  showAlert("Login successful! Redirecting...", "success");
+
+  setTimeout(() => location.href = "user_dashboard%20(1).html", 2000);
+});
+
+function showAlert(msg, type) {
+  alertBox.style.display = "block";
+  alertBox.innerText = msg;
+  alertBox.style.background = type === "error" ? "#ff4d4d" : "#0ff";
+  alertBox.style.color = type === "error" ? "#721c24" : "#0a0a0f";
+
+  // Hide after 3 seconds
+  setTimeout(() => {
+    alertBox.style.display = "none";
+  }, 3000);
+}
+
+document.querySelector(".toggle-password").addEventListener("click", e => {
+  password.type = password.type==="password"?"text":"password";
+  e.target.classList.toggle("fa-eye-slash");
+});
+</script>
+
+</body>
+
+</html>

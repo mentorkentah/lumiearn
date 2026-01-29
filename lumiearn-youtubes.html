@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Watch Videos</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+
+/* DARK MODE */
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#ffffff;
+}
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:250px;background:var(--sidebar);position:fixed;left:-250px;top:0;height:100%;padding:20px;transition:.3s;z-index:1000;}
+.sidebar.active{left:0;}
+.sidebar h2{text-align:center;margin-bottom:25px;color:var(--accent);}
+
+/* MENU */
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;cursor:pointer;}
+.menu-item:hover{background:rgba(0,0,0,.05);}
+.menu-left{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);}
+
+/* SUBMENU */
+.submenu{display:none;flex-direction:column;padding-left:28px;}
+.submenu a{text-decoration:none;color:var(--accent);padding:6px 0;font-size:14px;}
+
+/* ACTIVE MENU ITEM */
+.menu-item a.active,
+.menu-item.open>.menu-left{background:rgba(0,207,200,.15);border-left:10px solid var(--accent);border-radius:0 10px 10px 0;}
+
+/* MAIN */
+.main{padding:20px;}
+
+/* HEADER BAR */
+.header{display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:12px 16px;border-radius:14px;margin-bottom:25px;box-shadow:0 6px 18px rgba(0,0,0,.08);border-left:4px solid var(--accent);}
+
+/* HAMBURGER */
+.menu-toggle{width:38px;height:38px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.menu-toggle span{width:18px;height:2px;background:#000;position:absolute;transition:.3s;}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+
+/* MODE BUTTON */
+.mode-btn{background:var(--card);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
+
+/* AD GRID */
+.ad-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:15px;
+}
+.ad-card{
+  background:var(--card);
+  padding:15px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+.ad-card iframe{
+  width:100%;
+  height:180px;
+  border:none;
+  border-radius:10px;
+}
+.ad-card button{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+}
+
+/* WIN NOTIFICATION */
+.win-notification{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:var(--accent);
+  color:#fff;
+  padding:12px 18px;
+  border-radius:10px;
+  opacity:0;
+  transition:.3s;
+  z-index:9999;
+}
+.win-notification.show{ opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h2>LUMIEARN</h2>
+  <div class="menu-item">
+    <a href="dashboard.html" class="menu-left"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-whatsapp"></i></i><span>Whatsapp</span>
+    </a>
+  </div>
+  
+  <div class="menu-item has-sub" id="Btn">
+    <div class="menu-left"><i class="fa-solid fa-gift"></i><span>Site Bonuses</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Welcome Bonus</a>
+    <a href="completed-tasks.html">Weekly Bonus</a>
+  </div>
+  
+  <div class="menu-item has-sub" id="tasksBtn">
+    <div class="menu-left"><i class="fa-solid fa-list-check"></i><span>Daily Tasks</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Tasks Timetble</a>
+    <a href="completed-tasks.html">Completed Tasks</a>
+  </div>
+
+<div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+     <i class="fa-solid fa-user-plus"></i></i></i></i><span>Activate User</span>
+    </a>
+  </div>
+    <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-tiktok"></i><span>Tiktok Videos</span>
+    </a>
+  </div>
+   <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-youtube"></i><span>Youtube Videos</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-square-poll-vertical"></i></i></i><span>Daily Surveys</span>
+    </a>
+  </div>
+ <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+     <i class="fa-solid fa-circle-question"></i></i></i></i><span>Trivia Quizes</span>
+    </a>
+  </div>
+  
+   <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-video"></i></i><span>Ads Clicking</span>
+    </a>
+  </div>
+<div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-film"></i></i><span>Watch Movies</span>
+    </a>
+  </div>
+  
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-circle-play"></i></i><span>Netflix Videos</span>
+    </a>
+  </div>
+    <div class="menu-item has-sub" id="spinBtn">
+    <div class="menu-left"><i class="fa-solid fa-dice"></i><span>Spins</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://localhost:8158/free-spin.html" id="performSpin">Free Spin</a>
+    <a href="http://localhost/casino-spin.html" id="casinoLink">Casino</a>
+  </div>
+  
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-facebook"></i></i><span>Fb meta Ads</span>
+    </a>
+  </div>
+  
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-instagram"></i></i><span>Instagram Reels</span>
+    </a>
+  </div>
+  
+   <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-user-group"></i></i></i></i><span>Lonely foreigners chat</span>
+    </a>
+  </div>
+  
+  <div class="submenu">
+    <a href="profile.html">Profile</a>
+    <a href="security.html">Security</a>
+  </div>
+  <div class="menu-item">
+    <a href="withdrawals.html" class="menu-left"><i class="fa-solid fa-book"></i><span>E-Books</span></a>
+  </div>
+  
+<div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+     <i class="fa-solid fa-gamepad"></i></i></i></i><span>Online Gaming</span>
+    </a>
+  </div>
+  
+ <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+     <i class="fa-solid fa-chart-line"></i></i></i></i><span>Forex Classes</span>
+    </a>
+  </div>
+  
+  <div class="menu-item has-sub" id="accountBtn">
+    <div class="menu-left"><i class="fa-solid fa-user"></i><span>Account</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">User Profile</a>
+    <a href="completed-tasks.html">Download App</a>
+   <a href="completed-tasks.html">Share Link</a> 
+  </div> 
+  <div class="menu-item">
+    <a href="log.html" class="menu-left"><i class="fa-solid fa-power-off"></i><span>Logout</span></a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="header">
+    <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+    <strong>LUMIEARN</strong>
+    <button class="mode-btn" id="modeBtn"><i class="fa-solid fa-moon"></i></button>
+  </div>
+
+  <h2>Watch YouTube Ads & Earn</h2>
+  <div class="ad-grid" id="adGrid"></div>
+</div>
+
+<!-- WIN NOTIFICATION -->
+<div class="win-notification" id="winNotification"><span id="winMessage"></span></div>
+
+<script>
+/* --- SIDEBAR TOGGLE --- */
+const menuToggle = document.getElementById("menuToggle");
+const sidebar = document.getElementById("sidebar");
+menuToggle.onclick = () => {
+  sidebar.classList.toggle("active");
+  menuToggle.classList.toggle("active");
+};
+document.addEventListener("click", e => {
+  if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+    sidebar.classList.remove("active");
+    menuToggle.classList.remove("active");
+  }
+});
+
+/* --- SUBMENU TOGGLE --- */
+document.querySelectorAll(".menu-item.has-sub").forEach(btn => {
+  btn.addEventListener("click", e => {
+    if(e.target.tagName.toLowerCase() !== 'a'){
+      e.preventDefault();
+      document.querySelectorAll(".menu-item.has-sub").forEach(other => {
+        if(other !== btn){
+          other.classList.remove("open");
+          if(other.nextElementSibling && other.nextElementSibling.classList.contains("submenu"))
+            other.nextElementSibling.style.display = "none";
+        }
+      });
+      btn.classList.toggle("open");
+      const submenu = btn.nextElementSibling;
+      if(submenu && submenu.classList.contains("submenu")){
+        submenu.style.display = submenu.style.display === "flex" ? "none" : "flex";
+      }
+    }
+  });
+});
+
+/* --- DARK MODE --- */
+document.getElementById("modeBtn").onclick = () => {
+  document.body.classList.toggle("dark");
+};
+
+/* --- VIDEO ADS LOGIC --- */
+const username = localStorage.getItem("LUMIEARN_LOGGED_IN") || "User";
+let wallet = JSON.parse(localStorage.getItem(`wallet_${username}`)) || {profit:0};
+
+const isEarningDay = () => new Date().getDay() === 4;
+
+const videos = [
+ {id:1, title:"Ad Video 1", url:"https://www.youtube.com/embed/6LotPhR1qHY"},
+ {id:2, title:"Ad Video 2", url:"https://www.youtube.com/embed/VIDEO_ID_2"},
+ {id:3, title:"Ad Video 3", url:"https://www.youtube.com/embed/VIDEO_ID_3"}
+];
+
+const adGrid = document.getElementById("adGrid");
+adGrid.innerHTML = videos.map(v => {
+  const done = localStorage.getItem(`watched_${username}_${v.id}`);
+  return `
+    <div class="ad-card">
+      <iframe src="${v.url}" allowfullscreen></iframe>
+      <strong>${v.title}</strong>
+      <button ${done?"disabled":""} data-id="${v.id}">${done?"Watched":"Watch & Earn"}</button>
+    </div>`;
+}).join("");
+
+adGrid.addEventListener("click", e => {
+  if(e.target.tagName !== "BUTTON") return;
+  const btn = e.target;
+  const card = btn.closest(".ad-card");
+  const iframe = card.querySelector("iframe");
+  const id = btn.dataset.id;
+
+  btn.disabled = true;
+  btn.textContent = "Watching...";
+  iframe.src += "?autoplay=1";
+
+  setTimeout(() => {
+    if(!isEarningDay()){
+      show("Earning available only on Thursday");
+      btn.disabled = false;
+      btn.textContent = "Watch & Earn";
+      iframe.src = iframe.src.split("?")[0];
+      return;
+    }
+    localStorage.setItem(`watched_${username}_${id}`, "true");
+    wallet.profit += 5;
+    localStorage.setItem(`wallet_${username}`, JSON.stringify(wallet));
+    btn.textContent = "Watched";
+    show("Reward added successfully");
+    iframe.src = iframe.src.split("?")[0];
+  }, 20000);
+});
+
+function show(msg){
+  const winMessage = document.getElementById("winMessage");
+  const winNotification = document.getElementById("winNotification");
+  winMessage.textContent = msg;
+  winNotification.classList.add("show");
+  setTimeout(() => winNotification.classList.remove("show"), 3000);
+}
+</script>
+
+</body>
+
+</body>
+
+<title>Footer at Bottom</title>
+<style>
+  /* Make the whole page a flex container in column direction */
+  html, body {
+    height: 100%;           /* Important to make body take full viewport height */
+    margin: 0;              /* Remove default margin */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Main content grows to fill space */
+  main {
+    flex: 1;
+  }
+
+  footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    background: #f1f1f1; /* Optional background */
+  }
+
+  footer a {
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+<main>
+</main>
+
+<footer>
+  Copyright © 2026 <strong>
+    <a href="#" target="_blank" style="color:inherit;">
+      LUMIEARN
+    </a>
+  </strong>.  
+  Designed with ❤️ by <strong>
+    <a href="https://besttech.com" target="_blank" style="color:#4da6ff;">
+      BestChoice Management
+    </a>
+  </strong>.  
+  All rights reserved.
+</footer>
+
+</body>
+</html>
+</html>
+</html>
