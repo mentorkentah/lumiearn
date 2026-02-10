@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Casino Spin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--sidebar:#fff;--text:#111;--accent:#00cfc8;}
+body.dark{--bg:#0a0a0f;--card:#111118;--sidebar:#111118;--text:#fff;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+.sidebar{width:250px;background:var(--sidebar);position:fixed;left:-250px;top:0;height:100%;padding:20px;transition:.3s;z-index:1000;}
+.sidebar.active{left:0;}
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:12px;cursor:pointer;border-radius:0 28px 28px 0;transition:.2s;}
+.menu-item:hover{background:rgba(0,0,0,.05);}
+.menu-left{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);}
+.submenu{display:none;flex-direction:column;padding-left:28px;}
+.submenu a{text-decoration:none;color:var(--accent);padding:10px 0;font-size:14px;}
+.menu-item a.active,.menu-item.open>.menu-left{background:rgba(0,207,200,.15);color:var(--text);width:100%;margin-left:-12px;margin-right:-12px;padding:12px 20px;min-height:40px;display:flex;align-items:center;gap:10px;border-left:10px solid var(--accent);border-radius:0 20px 20px 0;box-sizing:border-box;}
+.main{padding:20px;flex:1;margin-left:0;transition:.3s;}
+.header{display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:12px 16px;border-radius:14px;margin-bottom:25px;box-shadow:0 6px 18px rgba(0,0,0,.08);border-left:4px solid var(--accent);}
+.menu-toggle{width:38px;height:38px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.menu-toggle span{width:18px;height:2px;background:#000;position:absolute;transition:.3s;}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;} .menu-toggle span:nth-child(2){top:18px;} .menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);} 
+.menu-toggle.active span:nth-child(2){opacity:0;} 
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+.mode-btn{background:var(--card);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.container{background:#fff;max-width:400px;width:100%;padding:20px;border-radius:10px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.1);margin:auto;}
+.wheel-container{position:relative;width:320px;height:320px;margin:20px auto;}
+canvas{border-radius:50%;border:8px solid #facc15;}
+.center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;background:gold;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:30px;color:#fff;cursor:pointer;z-index:5;}
+.arrow{position:absolute;top:-15px;left:50%;transform:translateX(-50%) rotate(180deg);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-bottom:30px solid gold;}
+#spinWheelBtn{padding:12px 30px;border:none;border-radius:30px;background:linear-gradient(45deg,#6a4dfd,#2b3350);color:#fff;font-size:16px;cursor:pointer;margin-top:10px;}
+.win-notification{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);background:#22c55e;color:#fff;padding:15px 20px;width:50%;max-width:500px;display:flex;gap:10px;align-items:center;opacity:0;transition:.4s;z-index:1000;}
+.win-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.win-notification i{margin-left:auto;cursor:pointer;}
+footer{text-align:center;padding:15px;font-size:14px;background:#f1f1f1;}
+footer a{text-decoration:none;}
+input[type=number]{padding:8px 12px;border-radius:6px;border:1px solid #ccc;width:100px;margin-top:10px;text-align:center;}
+select{padding:8px 12px;border-radius:6px;border:1px solid #ccc;margin-left:5px;}
+label{font-weight:bold;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <strong>MENU</strong>
+  <div class="menu-item">
+    <a href="dashboard.html" class="menu-left"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-whatsapp"></i></i><span>Whatsapp</span>
+    </a>
+  </div>
+  
+  <div class="menu-item has-sub" id="Btn">
+    <div class="menu-left"><i class="fa-solid fa-gift"></i><span>Site Bonuses</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Welcome Bonus</a>
+    <a href="completed-tasks.html">Weekly Bonus</a>
+  </div>
+  
+  <div class="menu-item has-sub" id="tasksBtn">
+    <div class="menu-left"><i class="fa-solid fa-list-check"></i><span>Daily Tasks</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Tasks Timetble</a>
+    <a href="completed-tasks.html">Completed Tasks</a>
+    
+  </div>
+  
+
+<div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+     <i class="fa-solid fa-user-plus"></i></i></i></i><span>Activate User</span>
+    </a>
+  </div>
+    <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-tiktok"></i><span>Tiktok Videos</span>
+    </a>
+  </div>
+   <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-youtube"></i><span>Youtube Videos</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-square-poll-vertical"></i></i></i><span>Daily Surveys</span>
+    </a>
+  </div>
+ <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+     <i class="fa-solid fa-circle-question"></i></i></i></i><span>Trivia Quizes</span>
+    </a>
+  </div>
+  
+   <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-video"></i></i><span>Ads Clicking</span>
+    </a>
+  </div>
+<div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-film"></i></i><span>Watch Movies</span>
+    </a>
+  </div>
+  
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-circle-play"></i></i><span>Netflix Videos</span>
+    </a>
+  </div>
+    <div class="menu-item has-sub" id="spinBtn">
+    <div class="menu-left"><i class="fa-solid fa-dice"></i><span>Spins</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://localhost:8158/free-spin.html" id="performSpin">Free Spin</a>
+    <a href="http://localhost/casino-spin.html" id="casinoLink">Casino</a>
+  </div>
+  
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-facebook"></i></i><span>Fb meta Ads</span>
+    </a>
+  </div>
+  
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-instagram"></i></i><span>Instagram Reels</span>
+    </a>
+  </div>
+  
+   <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-user-group"></i></i></i></i><span>Lonely foreigners chat</span>
+    </a>
+  </div>
+  
+  <div class="submenu">
+    <a href="profile.html">Profile</a>
+    <a href="security.html">Security</a>
+  </div>
+  <div class="menu-item">
+    <a href="withdrawals.html" class="menu-left"><i class="fa-solid fa-book"></i><span>E-Books</span></a>
+  </div>
+  
+<div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+     <i class="fa-solid fa-gamepad"></i></i></i></i><span>Online Gaming</span>
+    </a>
+  </div>
+  
+ <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+     <i class="fa-solid fa-chart-line"></i></i></i></i><span>Forex Classes</span>
+    </a>
+  </div>
+  
+  <div class="menu-item has-sub" id="accountBtn">
+    <div class="menu-left"><i class="fa-solid fa-user"></i><span>Account</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">User Profile</a>
+    <a href="completed-tasks.html">Download App</a>
+   <a href="completed-tasks.html">Share Link</a> 
+  </div> 
+  <div class="menu-item">
+    <a href="log.html" class="menu-left"><i class="fa-solid fa-power-off"></i><span>Logout</span></a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <div style="display:flex; align-items:center; width:38px;">
+      <div class="menu-toggle" id="menuToggle">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+<div class="brand">
+  <!-- Brand title -->
+  <span class="brand-name">LUMIEARN</span>
+</div>
+
+<style>
+.brand {
+  display: flex;
+  align-items: center; /* vertically aligns text */
+  font-family: Arial, sans-serif;
+  height: 40px;        /* match your header height */
+  
+  /* Option: move brand from the start */
+  padding-left: 46px;  /* adjust this value to move it forward */
+}
+
+.brand-name {
+  font-size: 25px;     /* text size */
+  font-weight: bold;
+  color: #1e1e1e;
+  line-height: 1;
+}
+</style>
+
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <div style="display:flex; align-items:center; gap:8px;">
+      <img id="countryFlag" src="" alt="Country"
+           style="width:28px;height:20px;border-radius:4px;">
+      <button class="mode-btn" id="modeBtn">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <img id="dashboardAvatar"
+           src="https://i.pravatar.cc/150?u=user"
+           style="width:38px;height:38px;border-radius:50%;
+                  object-fit:cover;cursor:pointer;
+                  border:2px solid var(--accent);">
+    </div>
+  </div>
+
+  <!-- CASINO SPIN -->
+  <div class="container">
+    <h2>CASINO SPIN</h2>
+    <p>
+      <label>Choose Wallet:</label>
+      <select id="stakeType">
+        <option value="balance">Main Balance</option>
+        <option value="deposit">Deposit Balance</option>
+      </select>
+    </p>
+    <p>
+      <input type="number" id="stakeAmount" min="0.5" step="0.01" placeholder="Enter amount">
+    </p>
+    <div class="wheel-container">
+      <canvas id="wheel" width="320" height="320"></canvas>
+      <div class="center" id="diceBtn"><i class="fa-solid fa-dice"></i></div>
+      <div class="arrow"></div>
+    </div>
+    <button id="spinWheelBtn">Spin</button>
+  </div>
+</div>
+
+<div class="win-notification" id="winNotification">
+  <span id="winMessage"></span><i class="fa-solid fa-xmark" id="closeWin"></i>
+</div>
+
+<footer>
+  Copyright © 2026 <strong><a href="#" target="_blank" style="color:inherit;">LUMIEARN</a></strong>. Designed with ❤️ by <strong><a href="#" target="_blank" style="color:#4da6ff;">BestChoice Management</a></strong>. All rights reserved.
+</footer>
+
+<script>
+// Hamburger & Sidebar
+const menuToggle=document.getElementById("menuToggle");
+const sidebar=document.getElementById("sidebar");
+menuToggle.onclick=()=>{sidebar.classList.toggle("active");menuToggle.classList.toggle("active");};
+document.addEventListener("click",e=>{
+  if(!sidebar.contains(e.target)&&!menuToggle.contains(e.target)){
+    sidebar.classList.remove("active");
+    menuToggle.classList.remove("active");
+  }
+});
+document.querySelectorAll(".menu-item.has-sub").forEach(btn=>{
+  btn.addEventListener("click",e=>{
+    if(e.target.tagName.toLowerCase()!=='a'){
+      e.preventDefault();
+      document.querySelectorAll(".menu-item.has-sub").forEach(other=>{
+        if(other!==btn){other.classList.remove("open");if(other.nextElementSibling) other.nextElementSibling.style.display='none';}
+      });
+      btn.classList.toggle("open");
+      if(btn.nextElementSibling) btn.nextElementSibling.style.display=btn.nextElementSibling.style.display==='flex'?'none':'flex';
+    }
+  });
+});
+
+// Dark mode
+document.getElementById("modeBtn").onclick=()=>{document.body.classList.toggle("dark");};
+
+// USER DATA
+const username=localStorage.getItem("LUMIEARN_LOGGED_IN")||"User";
+const userData=JSON.parse(localStorage.getItem("LUMIEARN_USER_"+username?.toLowerCase()))||{country:"Kenya",currency:"KSH"};
+const userCurrency=userData.currency||"USD";
+const currencyRates={"USD":0.2,"KSH":15,"UGX":390,"TZS":250};
+let wallet=JSON.parse(localStorage.getItem(`wallet_${username}`))||{balance:10,deposit:5,profit:0};
+localStorage.setItem(`wallet_${username}`,JSON.stringify(wallet));
+const countryFlags={'Kenya':'https://flagcdn.com/w20/ke.png','Uganda':'https://flagcdn.com/w20/ug.png','Tanzania':'https://flagcdn.com/w20/tz.png','United States':'https://flagcdn.com/w20/us.png'};
+document.getElementById('countryFlag').src=countryFlags[userData.country]||countryFlags['United States'];
+
+// WHEEL
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
+let angle=0;
+const NUM_SLICES=10;
+const COLORS=["#0f172a","#22c55e","#3b82f6","#10b981","#16a34a","#2563eb","#9333ea","#1e293b","#84cc16","#f97316"];
+const DISPLAY_LABELS=["250","30","10","5000","10000","0","80","2","1","0"];
+function drawWheel(){
+  const slice=2*Math.PI/NUM_SLICES;
+  ctx.clearRect(0,0,320,320);
+  for(let i=0;i<NUM_SLICES;i++){
+    ctx.beginPath();
+    ctx.fillStyle=COLORS[i];
+    ctx.moveTo(160,160);
+    ctx.arc(160,160,160,angle+i*slice,angle+(i+1)*slice);
+    ctx.fill();
+    ctx.save();
+    ctx.translate(160,160);
+    ctx.rotate(angle+i*slice+slice/2);
+    ctx.fillStyle="#fff";
+    ctx.font="bold 14px Arial";
+    ctx.textAlign="right";
+    ctx.fillText(DISPLAY_LABELS[i],140,5);
+    ctx.restore();
+  }
+}
+drawWheel();
+
+// CASINO SPIN
+function casinoSpin(){
+  const stakeAmt = parseFloat(document.getElementById("stakeAmount").value);
+  const stakeType = document.getElementById("stakeType").value;
+  const minStake = 0.5;
+  const minLocal = +(minStake*(currencyRates[userCurrency]||1)).toFixed(2);
+
+  if(wallet[stakeType] <= 0){
+    alert(`Your ${stakeType} wallet is empty. Spin cannot proceed.`);
+    return;
+  }
+  if(isNaN(stakeAmt) || stakeAmt < minLocal){
+    alert(`Minimum stake is ${minLocal} ${userCurrency}`);
+    return;
+  }
+  if(wallet[stakeType] < stakeAmt){
+    alert(`Insufficient ${stakeType} balance!`);
+    return;
+  }
+
+  // Deduct stake
+  wallet[stakeType] -= stakeAmt;
+  localStorage.setItem(`wallet_${username}`, JSON.stringify(wallet));
+
+  // Spin
+  const target = Math.floor(Math.random() * NUM_SLICES);
+  const slice = 2 * Math.PI / NUM_SLICES;
+  const targetAngle = 6*2*Math.PI + target*slice;
+  const start = performance.now();
+  const duration = 4000;
+
+  function animate(t){
+    const p = Math.min((t-start)/duration,1);
+    angle = targetAngle*(1-Math.pow(1-p,3));
+    drawWheel();
+    if(p<1) requestAnimationFrame(animate);
+    else finish(target);
+  }
+  requestAnimationFrame(animate);
+}
+
+function finish(index){
+  let winUSD = 0;
+if(DISPLAY_LABELS[index] !== "0") {
+  winUSD = Math.floor(Math.random() * 2); // whole number 0-2
+}
+
+// convert to local currency (still whole numbers)
+const winLocal = Math.floor(winUSD * (currencyRates[userCurrency]||1));
+
+  const winNotification=document.getElementById("winNotification");
+  const winMessage=document.getElementById("winMessage");
+
+  if(winLocal>0){
+    wallet.balance += winLocal;
+    wallet.profit += winLocal;
+    localStorage.setItem(`wallet_${username}`, JSON.stringify(wallet));
+    winMessage.textContent=`Congratulations ${username}! You won ${winLocal} ${userCurrency}`;
+  } else {
+    winMessage.textContent=`Sorry ${username}, you landed on 0. No winnings.`;
+  }
+  winNotification.classList.add("show");
+  document.getElementById("closeWin").onclick=()=>{winNotification.classList.remove("show");};
+}
+
+document.getElementById("spinWheelBtn").onclick=casinoSpin;
+document.getElementById("diceBtn").onclick=casinoSpin;
+</script>
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Admin Dashboard</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+  --accent-dark:#0077ff;
+}
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:250px;
+  background:var(--sidebar);
+  position:fixed;
+  left:-250px;
+  top:0;
+  height:100vh;
+  padding:20px;
+  transition:.3s;
+  z-index:1000;
+  box-shadow:2px 0 12px rgba(0,0,0,.15);
+}
+.sidebar.active{left:0}
+.menu-item{padding:12px;border-radius:8px}
+.menu-item:hover{background:var(--accent);color:#fff}
+.menu-left{
+  color:var(--text);
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:500;
+}
+
+/* MAIN */
+.main{padding:20px;flex:1;margin-left:0}
+@media(min-width: 768px){.main{margin-left:250px;}}
+
+/* HEADER */
+.header{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--card);
+  padding:12px 20px;
+  border-radius:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.1);
+  margin-bottom:25px;
+}
+.brand{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:22px;
+  font-weight:700;
+  color:var(--accent);
+}
+.header-right{display:flex;align-items:center;gap:10px}
+
+/* MENU TOGGLE */
+.menu-toggle{
+  width:40px;height:40px;
+  display:flex;flex-wrap:wrap;gap:4px;
+  cursor:pointer;
+}
+.menu-toggle span{
+  width:18px;height:18px;
+  background:var(--accent);
+}
+
+/* COUNTRY */
+.country-selector{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:8px;
+  background:var(--card);
+  cursor:pointer;
+}
+.country-dropdown{
+  position:absolute;
+  top:120%;right:0;
+  background:var(--card);
+  border-radius:10px;
+  display:none;
+  overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+.country-dropdown div{
+  padding:10px 14px;
+  cursor:pointer;
+}
+.country-dropdown div:hover{background:var(--accent);color:#fff}
+.country-selector.active .country-dropdown{display:block}
+
+/* AVATAR */
+#dashboardAvatar{
+  width:40px;height:40px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  object-fit:cover;
+}
+
+/* WELCOME */
+.welcome-card{
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+  color:#fff;
+  padding:25px;
+  border-radius:18px;
+  margin-bottom:30px;
+  display:flex;
+  gap:20px;
+}
+
+/* PENDING */
+.pending-box{
+  background:rgba(255,255,255,.18);
+  padding:14px 18px;
+  border-radius:12px;
+  margin-top:12px;
+  font-size:20px;
+  font-weight:700;
+}
+.pending-progress{margin-top:10px}
+.pending-progress .label{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:6px;
+}
+.pending-progress .bar{
+  height:10px;
+  background:rgba(255,255,255,.35);
+  border-radius:10px;
+  overflow:hidden;
+}
+.pending-progress .bar span{
+  display:block;
+  height:100%;
+  width:0;
+  background:linear-gradient(135deg,#8360c3,#2ebf91);
+  transition:width 1.5s ease;
+}
+
+/* STATS */
+.stats-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+}
+.stats-card{
+  padding:20px;
+  border-radius:14px;
+  color:#fff;
+  text-align:center;
+  transition:.3s;
+}
+.stats-card:hover{transform:translateY(-6px)}
+.stats-card i{font-size:30px;margin-bottom:10px}
+.counter{font-size:24px;font-weight:700}
+
+/* PROGRESS (ADMIN PROFIT CARD) */
+.progress{
+  width:100%;
+  height:8px;
+  background:rgba(255,255,255,.35);
+  border-radius:10px;
+  margin-top:10px;
+}
+.progress span{
+  display:block;
+  height:100%;
+  width:0;
+  background:#fff;
+}
+
+/* COLORS */
+.users{background:linear-gradient(135deg,#00c6ff,#0072ff)}
+.today{background:linear-gradient(135deg,#f7971e,#ffd200);color:#111}
+.active{background:linear-gradient(135deg,#11998e,#38ef7d)}
+.inactive{background:linear-gradient(135deg,#434343,#000)}
+.admin{background:linear-gradient(135deg,#ff416c,#ff4b2b)}
+.payable{background:linear-gradient(135deg,#8360c3,#2ebf91)}
+.earnings{background:linear-gradient(135deg,#56ab2f,#a8e063)}
+.bonus{background:linear-gradient(135deg,#ff512f,#dd2476)}
+.withdrawals{background:linear-gradient(135deg,#8e2de2,#4a00e0)}
+.withdrawn{background:linear-gradient(135deg,#a1c4fd,#c2e9fb)}
+.total-paid{background:linear-gradient(135deg,#fbc2eb,#a6c1ee)}
+.today-paid{background:linear-gradient(135deg,#fddb92,#d1fdff);color:#111}
+
+/* FOOTER */
+footer{
+  margin-top:auto;
+  margin:20px;
+  padding:15px;
+  text-align:center;
+  background:var(--card);
+  border-radius:12px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <strong>MENU</strong>
+  <div class="menu-item"><a class="menu-left"><i class="fa-solid fa-house"></i> Dashboard</a></div>
+  <div class="menu-item"><a class="menu-left"><i class="fa-solid fa-users"></i> Users</a></div>
+  <div class="menu-item"><a class="menu-left"><i class="fa-solid fa-gift"></i> Bonuses</a></div>
+  <div class="menu-item"><a class="menu-left"><i class="fa-solid fa-wallet"></i> Withdrawals</a></div>
+  <div class="menu-item"><a class="menu-left"><i class="fa-solid fa-chart-line"></i> Reports</a></div>
+  <div class="menu-item"><a class="menu-left"><i class="fa-solid fa-gear"></i> Settings</a></div>
+</div>
+
+<div class="main">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="menu-toggle" id="menuToggle">
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <div class="brand">LUMIEARN</div>
+
+  <div class="header-right">
+    <div class="country-selector" id="countrySelector">
+      <span id="countryFlag">🇰🇪</span>
+      <span id="countryCurrency">KSH</span>
+      <i class="fa-solid fa-chevron-down"></i>
+      <div class="country-dropdown">
+        <div data-code="KES">🇰🇪 KSH</div>
+        <div data-code="UGX">🇺🇬 UGX</div>
+        <div data-code="XOF">🇹🇬 XOF</div>
+        <div data-code="XAF">🇨🇲 XAF</div>
+      </div>
+    </div>
+    <img id="dashboardAvatar" src="https://i.pravatar.cc/150?u=admin">
+  </div>
+</div>
+
+<!-- WELCOME -->
+<div class="welcome-card">
+  <i class="fa-solid fa-user-shield fa-3x"></i>
+  <div style="flex:1">
+    <h2>Welcome back, Admin 👋</h2>
+    <p>Monitor platform performance.</p>
+
+    <div class="pending-box">
+       <i class="fa-solid fa-arrow-trend-down"></i>
+       <h3>Pending Withdrawals</h3>
+       <p class="counter money"></p>
+       <small style="opacity:.85"><span class="counter"></span> users</small>
+    </div>
+
+    <div class="pending-progress">
+      <div class="label">
+        <span>Pending vs Payable</span>
+        <span id="pendingPercent">0%</span>
+      </div>
+      <div class="bar">
+        <span id="pendingBar"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-container">
+  <div class="stats-card users"><i class="fa-solid fa-users"></i><h3>Total Users</h3><p class="counter"></p></div>
+  <div class="stats-card today"><i class="fa-solid fa-user-plus"></i><h3>Joined Today</h3><p class="counter"></p></div>
+  <div class="stats-card active"><i class="fa-solid fa-user-check"></i><h3>Active Users</h3><p class="counter"></p></div>
+  <div class="stats-card inactive"><i class="fa-solid fa-user-slash"></i><h3>Inactive Users</h3><p class="counter"></p></div>
+  <div class="stats-card admin"><i class="fa-solid fa-wallet"></i><h3>Admin Profit</h3><p class="counter money"></p><div class="progress"><span></span></div></div>
+  <div class="stats-card payable"><i class="fa-solid fa-file-invoice-dollar"></i><h3>Payable</h3><p class="counter money"></p></div>
+  <div class="stats-card earnings"><i class="fa-solid fa-chart-line"></i><h3>Earnings</h3><p class="counter money"></p></div>
+  <div class="stats-card bonus"><i class="fa-solid fa-gift"></i><h3>Bonus Claims</h3><p class="counter money"></p><small style="opacity:.85"><span class="counter"></span> claims</small></div>
+  <div class="stats-card withdrawals"><i class="fa-solid fa-arrow-trend-down"></i><h3>Pending Withdrawals</h3><p class="counter money"></p><small style="opacity:.85"><span class="counter"></span> users</small></div>
+
+  <div class="stats-card withdrawn"><i class="fa-solid fa-money-bill-transfer"></i><h3>Total Admin Withdrawn</h3><p class="counter money"></p></div>
+  <div class="stats-card total-paid"><i class="fa-solid fa-hand-holding-dollar"></i><h3>Total Paid Amount</h3><p class="counter money"></p></div>
+  <div class="stats-card today-paid"><i class="fa-solid fa-calendar-day"></i><h3>Today's Paid</h3><p class="counter money"></p></div>
+</div>
+
+<footer>
+© 2026 <strong>LUMIEARN</strong> · Designed with ❤️ by <strong>BestChoice Management</strong>
+</footer>
+
+<script>
+/* SIDEBAR TOGGLE */
+const sidebar=document.getElementById("sidebar");
+const menuToggle=document.getElementById("menuToggle");
+menuToggle.onclick=e=>{
+  sidebar.classList.toggle("active");
+  e.stopPropagation();
+};
+document.addEventListener("click",e=>{
+  if(!sidebar.contains(e.target)&&!menuToggle.contains(e.target)){
+    sidebar.classList.remove("active");
+  }
+});
+
+/* CURRENCY & SELECTOR */
+const currencies={
+  KES:{symbol:"KSH",rate:1,flag:"🇰🇪"},
+  UGX:{symbol:"UGX",rate:39,flag:"🇺🇬"},
+  XOF:{symbol:"XOF",rate:7.4,flag:"🇹🇬"},
+  XAF:{symbol:"XAF",rate:7.4,flag:"🇨🇲"}
+};
+let activeCurrency=localStorage.getItem("currency")||"KES";
+countryFlag.textContent=currencies[activeCurrency].flag;
+countryCurrency.textContent=currencies[activeCurrency].symbol;
+
+countrySelector.onclick=()=>countrySelector.classList.toggle("active");
+document.querySelectorAll(".country-dropdown div").forEach(d=>{
+  d.onclick=()=>{
+    localStorage.setItem("currency",d.dataset.code);
+    location.reload();
+  };
+});
+
+/* --- DASHBOARD CALCULATIONS --- */
+function calculateDashboard(){
+  const todayStr=new Date().toISOString().split('T')[0];
+
+  let totalUsers=0, joinedToday=0, activeUsers=0, inactiveUsers=0,
+      adminProfit=0, payable=0, earnings=0, bonusClaims=0,
+      pendingWithdrawals=0, totalWithdrawn=0, totalPaid=0, todayPaid=0;
+
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(!key.startsWith("LUMIEARN_USER_")) continue;
+
+    totalUsers++;
+    const user=JSON.parse(localStorage.getItem(key));
+    const walletKey=`wallet_${user.username}`;
+    const wallet=JSON.parse(localStorage.getItem(walletKey))||{};
+
+    if(user.joinDate===todayStr) joinedToday++;
+    if(wallet.balance>0) activeUsers++; else inactiveUsers++;
+
+    adminProfit += wallet.spinsLost||0;
+    adminProfit += wallet.withdrawalFee||0;
+
+    payable += wallet.pending||0;
+    earnings += (wallet.profit||0) + (wallet.referralBonus||0) + (wallet.deposit||0);
+    bonusClaims += (wallet.referralBonus||0) + (wallet.welcomeBonus||0);
+    pendingWithdrawals += wallet.pending||0;
+    totalWithdrawn += wallet.totalWithdrawn||0;
+    totalPaid += wallet.totalWithdrawn||0;
+    if(wallet.lastWithdrawalDate===todayStr) todayPaid += wallet.totalWithdrawn||0;
+  }
+
+  return {totalUsers, joinedToday, activeUsers, inactiveUsers, adminProfit, payable, earnings, bonusClaims, pendingWithdrawals, totalWithdrawn, totalPaid, todayPaid};
+}
+
+/* --- UPDATE COUNTERS --- */
+function updateCounters(){
+  const data=calculateDashboard();
+
+  document.querySelectorAll(".counter").forEach(counter=>{
+    const label=counter.closest(".stats-card")?.querySelector("h3")?.innerText.toLowerCase() || "";
+    let value=0;
+    const isMoney=counter.classList.contains("money");
+
+    if(label.includes("total users")) value=data.totalUsers;
+    else if(label.includes("joined today")) value=data.joinedToday;
+    else if(label.includes("active users")) value=data.activeUsers;
+    else if(label.includes("inactive users")) value=data.inactiveUsers;
+    else if(label.includes("admin profit")) value=data.adminProfit;
+    else if(label.includes("payable")) value=data.payable;
+    else if(label.includes("earnings")) value=data.earnings;
+    else if(label.includes("bonus")) value=data.bonusClaims;
+    else if(label.includes("pending withdrawals")) value=data.pendingWithdrawals;
+    else if(label.includes("total admin withdrawn")) value=data.totalWithdrawn;
+    else if(label.includes("total paid amount")) value=data.totalPaid;
+    else if(label.includes("today's paid")) value=data.todayPaid;
+
+    if(isMoney) value=Math.round(value*currencies[activeCurrency].rate);
+
+    const target=value;
+    let current=0;
+    const inc=Math.ceil(target/120);
+    function run(){
+      current+=inc;
+      if(current<target){
+        counter.textContent=isMoney
+          ? currencies[activeCurrency].symbol+"  "+current.toLocaleString()
+          : current.toLocaleString();
+        requestAnimationFrame(run);
+      } else {
+        counter.textContent=isMoney
+          ? currencies[activeCurrency].symbol+"  "+target.toLocaleString()
+          : target.toLocaleString();
+      }
+    }
+    run();
+  });
+
+  /* UPDATE PENDING BAR */
+  const pendingPercent=Math.min(100, (data.pendingWithdrawals/data.payable)*100 || 0);
+  document.getElementById("pendingPercent").textContent=pendingPercent.toFixed(1)+"%";
+  document.getElementById("pendingBar").style.width=pendingPercent+"%";
+}
+
+updateCounters();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Level 1 Inactive Users</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f0fb;
+    padding: 20px;
+}
+
+.card {
+    max-width: 1100px;
+    margin: auto;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #e84393, #6c5ce7);
+    color: #fff;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card-body {
+    padding: 15px 20px;
+}
+
+.earnings {
+    color: #4a6cf7;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Search */
+.search-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.search-box input {
+    width: 220px;
+    padding: 6px 10px;
+    border: 1px solid #cfcfe6;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+/* Table */
+.table-wrapper {
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #cfcfe6;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    background: #eaeaff;
+    z-index: 2;
+}
+
+th, td {
+    border: 1px solid #cfcfe6;
+    padding: 10px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+tbody tr:hover {
+    background: #eef2ff;
+}
+
+.status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+    background: #e74c3c; /* Inactive color */
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    border: 1px solid #cfcfe6;
+    background: #fff;
+    cursor: pointer;
+}
+
+.pagination-numbers button {
+    margin: 0 3px;
+}
+
+.pagination-numbers button.active {
+    background: #6c5ce7;
+    color: #fff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="card-header">LEVEL 1 INACTIVE USERS</div>
+
+    <div class="card-body">
+        <div class="earnings" id="totalEarnings">Total Level 1 Earnings : 0</div>
+        <div class="earnings" id="totalUsers">Level 1 Total Users : 0</div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search user...">
+        </div>
+
+        <div class="table-wrapper">
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>USERNAME</th>
+                        <th>MOBILE</th>
+                        <th>EARNED</th>
+                        <th>STATUS</th>
+                        <th>BALANCE</th>
+                        <th>COUNTRY</th>
+                        <th>DATE JOINED</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic rows inserted here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="showingInfo" style="font-size:13px;color:#555;margin-top:6px;">
+            Showing page 1 of 1
+        </div>
+
+        <div class="pagination">
+            <button id="prevPage">⬅ Prev</button>
+            <div class="pagination-numbers" id="paginationNumbers"></div>
+            <button id="nextPage">Next ➡</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- CONFIG ---
+const rowsPerPage = 50;
+let currentPage = 1;
+
+// --- HELPER TO GET INACTIVE LEVEL 1 USERS ---
+function getInactiveDownlines(uplineUsername, inactiveDays = 30) {
+    const threshold = Date.now() - inactiveDays * 24 * 60 * 60 * 1000;
+    const allUsers = Object.keys(localStorage)
+        .filter(k => k.startsWith("LUMIEARN_USER_"))
+        .map(k => JSON.parse(localStorage.getItem(k)));
+
+    const lvl1Inactive = allUsers.filter(u =>
+        u.referredBy === uplineUsername &&
+        (!u.lastActive || u.lastActive < threshold)
+    );
+
+    return lvl1Inactive;
+}
+
+// --- RENDER TABLE ---
+function renderTable() {
+    const currentUser = localStorage.getItem("LUMIEARN_LOGGED_IN") || "LUMIEARN";
+    const inactiveUsers = getInactiveDownlines(currentUser, 30);
+
+    const tbody = document.querySelector("#userTable tbody");
+    tbody.innerHTML = "";
+
+    inactiveUsers.forEach(u => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${u.username}</td>
+            <td>${u.phone}</td>
+            <td>${u.profit || 0} ${u.currency}</td>
+            <td><span class="status">Inactive</span></td>
+            <td>${u.balance || 0} ${u.currency}</td>
+            <td>${u.country}</td>
+            <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    totalUsersEl.innerText = "Level 1 Total Users : " + inactiveUsers.length;
+    totalEarningsEl.innerText = "Total Level 1 Earnings : " + inactiveUsers.reduce((acc,u)=>acc+(u.profit||0),0) + " " + (inactiveUsers[0]?.currency||"KSH"));
+
+    return inactiveUsers;
+}
+
+// --- PAGINATION ---
+const totalUsersEl = document.getElementById("totalUsers");
+const totalEarningsEl = document.getElementById("totalEarnings");
+const showingInfo = document.getElementById("showingInfo");
+const paginationNumbers = document.getElementById("paginationNumbers");
+const prevBtn = document.getElementById("prevPage");
+const nextBtn = document.getElementById("nextPage");
+
+function displayPage(page) {
+    const rows = Array.from(document.querySelectorAll("#userTable tbody tr"));
+    const pageCount = Math.ceil(rows.length / rowsPerPage);
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    rows.forEach((row, i) => row.style.display = (i >= start && i < end) ? "" : "none");
+
+    currentPage = page;
+    showingInfo.innerText = `Showing page ${currentPage} of ${pageCount}`;
+    buildPagination(rows.length);
+}
+
+function buildPagination(totalRows) {
+    const pageCount = Math.ceil(totalRows / rowsPerPage);
+    paginationNumbers.innerHTML = "";
+
+    for (let i = 1; i <= pageCount; i++) {
+        const btn = document.createElement("button");
+        btn.innerText = i;
+        btn.className = i === currentPage ? "active" : "";
+        btn.onclick = () => displayPage(i);
+        paginationNumbers.appendChild(btn);
+    }
+
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === pageCount;
+}
+
+prevBtn.onclick = () => currentPage > 1 && displayPage(currentPage - 1);
+nextBtn.onclick = () => {
+    const rows = document.querySelectorAll("#userTable tbody tr");
+    if(currentPage < Math.ceil(rows.length / rowsPerPage)) displayPage(currentPage + 1);
+};
+
+// --- SEARCH ---
+document.getElementById("searchInput").addEventListener("keyup", function () {
+    const filter = this.value.toLowerCase();
+    const rows = Array.from(document.querySelectorAll("#userTable tbody tr"));
+
+    if(filter){
+        let count = 0;
+        rows.forEach(row => {
+            const match = row.innerText.toLowerCase().includes(filter);
+            row.style.display = match ? "" : "none";
+            if(match) count++;
+        });
+        document.querySelector(".pagination").style.display = "none";
+        showingInfo.innerText = `Showing ${count} matching users`;
+    } else {
+        document.querySelector(".pagination").style.display = "flex";
+        displayPage(1);
+    }
+});
+
+// --- INIT ---
+renderTable();
+displayPage(1);
+</script>
+
+</body>
+</html>

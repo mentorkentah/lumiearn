@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Dashboard</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+
+/* DARK MODE */
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Inter,sans-serif;
+}
+
+html, body{
+  height:100%;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* PAGE WRAPPER */
+.page-wrapper{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;
+  background:var(--sidebar);
+  position:fixed;
+  left:-260px;
+  top:0;
+  height:100%;
+  padding:20px;
+  transition:.3s ease;
+  z-index:2000;
+  overflow-y:auto;
+  box-shadow:4px 0 18px rgba(0,0,0,.15);
+}
+.sidebar.active{left:0;}
+
+.menu-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px;
+  cursor:pointer;
+  border-radius:0 28px 28px 0;
+}
+.menu-item:hover{background:rgba(0,0,0,.05);}
+
+.menu-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:var(--text);
+}
+
+.submenu{
+  display:none;
+  flex-direction:column;
+  padding-left:28px;
+}
+.submenu a{
+  text-decoration:none;
+  color:var(--accent);
+  padding:8px 0;
+  font-size:14px;
+}
+
+/* BACKDROP */
+.backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:1500;
+  display:none;
+}
+.backdrop.active{display:block;}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:10px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--card);
+  padding:12px 16px;
+  border-radius:14px;
+  margin-bottom:20px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  border-left:4px solid var(--accent);
+}
+
+/* HAMBURGER */
+.menu-toggle{
+  width:38px;
+  height:38px;
+  border-radius:8px;
+  background:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  position:relative;
+}
+.menu-toggle span{
+  width:18px;
+  height:2px;
+  background:#000;
+  position:absolute;
+  transition:.3s;
+}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+
+/* BRAND */
+.brand{
+  display:flex;
+  align-items:center;
+  padding-left:46px;
+}
+.brand-name{
+  font-size:25px;
+  font-weight:bold;
+}
+
+/* HEADER RIGHT */
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.mode-btn{
+  background:var(--card);
+  border:none;
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* CONTENT */
+#content-area{
+  min-height:60vh;
+}
+
+/* FOOTER */
+footer{
+  margin-top:auto;
+  text-align:center;
+  padding:15px;
+  font-size:14px;
+  background:#f1f1f1;
+}
+body.dark footer{
+  background:#111118;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+<!-- BACKDROP -->
+<div class="backdrop" id="backdrop"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="menu-item">
+    <a href="#" class="menu-left"><i class="fa-solid fa-house"></i>Dashboard</a>
+      </div>
+      <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-whatsapp"></i><span>Whatsapp</span></a>
+  </div>
+  <div class="menu-item has-sub" id="Btn">
+    <div class="menu-left"><i class="fa-solid fa-gift"></i><span>Site Bonuses</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Welcome Bonus</a>
+    <a href="completed-tasks.html">Weekly Bonus</a>
+  </div>
+
+  <div class="menu-item has-sub" id="tasksBtn">
+    <div class="menu-left"><i class="fa-solid fa-list-check"></i><span>Daily Tasks</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Tasks Timetable</a>
+    <a href="completed-tasks.html">Completed Tasks</a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-wallet"></i><span>Deposit</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-user-plus"></i><span>Activate User</span>
+    </a>
+  </div>
+    <div class="menu-item has-sub" id="accountBtn">
+    <div class="menu-left"><i class="fa-solid fa-hand-holding-dollar"></i><span>Withdraw</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://localhost:8158/user_profile.html">Withdraw balance</a>
+    <a href="completed-tasks.html">Withdraw youtube</a>
+    <a href="completed-tasks.html">Withdraw tiktok</a> 
+        <a href="completed-tasks.html">Withdraw surveys</a>
+    <a href="completed-tasks.html">Withdraw trivias</a> 
+  </div>
+
+  <div class="menu-item has-sub" id="downlinesBtn">
+    <div class="menu-left"><i class="fa-solid fa-users"></i><span>Downlines</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <div class="menu-left"><span>Level 1</span></div>
+    <a href="http://localhost:8158/level1-actives.html" id="checkLevel1">Active</a>
+    <a href="http://localhost:8158/casino-spin.html" id="checkLevel1">Inactive</a>
+    <div class="menu-left"><span>Level 2</span></div>
+    <a href="http://localhost:8158/level-team.html" id="checkLevel2">Active</a>
+    <a href="http://localhost:8158/casino-spin.html" id="checkLevel2">Inactive</a>
+    <div class="menu-left"><span>Level 3</span></div>
+    <a href="http://localhost:8158/level-team.html" id="checkLevel3">Active</a>
+    <a href="http://localhost:8158/casino-spin.html" id="checkLevel3">Inactive</a>
+  </div>
+
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-tiktok"></i><span>Tiktok Videos</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-youtube"></i><span>Youtube Videos</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-square-poll-vertical"></i><span>Daily Surveys</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-circle-question"></i><span>Trivia Quizzes</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-video"></i><span>Ads Clicking</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-film"></i><span>Watch Movies</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-circle-play"></i><span>Netflix Videos</span>
+    </a>
+  </div>
+
+  <div class="menu-item has-sub" id="spinBtn">
+    <div class="menu-left"><i class="fa-solid fa-dice"></i><span>Spins</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://localhost:8158/free-spin.html" id="performSpin">Free Spin</a>
+    <a href="http://localhost:8158/casino-spin.html" id="casinoLink">Casino</a>
+  </div>
+
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-facebook"></i><span>Fb meta Ads</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-instagram"></i><span>Instagram Reels</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-user-group"></i><span>Lonely foreigners chat</span>
+    </a>
+  </div>
+  <div class="submenu">
+    <a href="profile.html">Profile</a>
+    <a href="security.html">Security</a>
+  </div>
+  <div class="menu-item">
+    <a href="withdrawals.html" class="menu-left"><i class="fa-solid fa-book"></i><span>E-Books</span></a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-gamepad"></i><span>Online Gaming</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-chart-line"></i><span>Forex Classes</span>
+    </a>
+  </div> 
+    <div class="menu-item has-sub" id="accountBtn">
+    <div class="menu-left"><i class="fa-solid fa-user"></i><span>Account</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://localhost:8158/user_profile.html">User Profile</a>
+    <a href="completed-tasks.html">Download App</a>
+    <a href="completed-tasks.html">Share Link</a> 
+  </div>
+  <div class="menu-item">
+    <a href="http://localhost:8158/log.html" class="menu-left"><i class="fa-solid fa-power-off"></i><span>Logout</span></a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HEADER -->
+  <div class="header">
+
+    <div style="display:flex;align-items:center;width:38px;">
+      <div class="menu-toggle" id="menuToggle">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="brand">
+      <span class="brand-name">LUMIEARN</span>
+    </div>
+
+    <div class="header-right">
+      <img id="countryFlag" style="width:28px;height:20px;border-radius:4px;">
+      <button class="mode-btn" id="modeBtn">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <img src="https://i.pravatar.cc/150?u=user"
+           style="width:38px;height:38px;border-radius:50%;
+                  border:2px solid var(--accent);cursor:pointer;">
+    </div>
+
+  </div>
+
+  <!-- CONTENT -->
+  <main id="content-area">
+    <!-- Add pages here -->
+  </main>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Copyright © 2026
+  <strong>LUMIEARN</strong>.
+  Designed with ❤️ by
+  <strong>BestChoice Management</strong>.
+  All rights reserved.
+</footer>
+
+</div>
+
+<script>
+/* SIDEBAR */
+const sidebar = document.getElementById("sidebar");
+const toggle = document.getElementById("menuToggle");
+const backdrop = document.getElementById("backdrop");
+
+toggle.onclick = () => {
+  sidebar.classList.toggle("active");
+  toggle.classList.toggle("active");
+  backdrop.classList.toggle("active");
+};
+backdrop.onclick = () => {
+  sidebar.classList.remove("active");
+  toggle.classList.remove("active");
+  backdrop.classList.remove("active");
+};
+
+/* SUBMENUS */
+document.querySelectorAll(".menu-item.has-sub").forEach(btn=>{
+  btn.onclick=()=>{
+    const submenu=btn.nextElementSibling;
+    submenu.style.display=submenu.style.display==="flex"?"none":"flex";
+  };
+});
+
+/* DARK MODE */
+document.getElementById("modeBtn").onclick=()=>{
+  document.body.classList.toggle("dark");
+};
+
+/* COUNTRY DETECTION */
+(async function(){
+  const flag=document.getElementById("countryFlag");
+  const flags={
+    KE:"https://flagcdn.com/w20/ke.png",
+    UG:"https://flagcdn.com/w20/ug.png",
+    TZ:"https://flagcdn.com/w20/tz.png",
+    GH:"https://flagcdn.com/w20/gh.png",
+    NG:"https://flagcdn.com/w20/ng.png",
+    US:"https://flagcdn.com/w20/us.png",
+    GB:"https://flagcdn.com/w20/gb.png"
+  };
+
+  const saved=localStorage.getItem("userCountry");
+  if(saved && flags[saved]){
+    flag.src=flags[saved];
+    return;
+  }
+
+  try{
+    const res=await fetch("https://ipapi.co/json/");
+    const data=await res.json();
+    const code=data.country_code||"US";
+    localStorage.setItem("userCountry",code);
+    flag.src=flags[code]||flags.US;
+  }catch{
+    flag.src=flags.US;
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password | LUMIEARN</title>
+
+<!-- Orbitron Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  overflow-x:hidden;
+  background:#0a0a0f;
+  font-family:'Orbitron',sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-card{
+  background:#111118;
+  padding:34px 30px;
+  border-radius:16px;
+  width:100%;
+  max-width:400px;
+  box-sizing:border-box;
+  box-shadow:0 0 20px rgba(0,255,240,.25);
+}
+
+h1{
+  color:#00fff0;
+  text-align:center;
+  margin-bottom:12px;
+}
+
+p{
+  color:#0ff;
+  text-align:center;
+  margin-bottom:20px;
+  opacity:.8;
+}
+
+.form-group{margin-bottom:18px;}
+
+label{
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:8px;
+  display:block;
+  color:#0ff;
+}
+
+.input-box{position:relative;width:100%;}
+
+.input-box i{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:16px;
+  color:#0ff;
+}
+
+.input-box i:first-child{left:16px;}
+.toggle-password{right:16px;cursor:pointer;}
+
+.input-box input{
+  width:100%;
+  height:54px;
+  padding:0 44px;
+  font-size:15px;
+  border-radius:14px;
+  border:1px solid rgba(0,255,240,.4);
+  background:transparent;
+  color:#fff;
+  box-sizing:border-box;
+}
+
+/* Autofill fix for Chrome/Edge */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px #111118 inset !important;
+    -webkit-text-fill-color: #fff !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Autofill fix for Firefox */
+input:-moz-autofill {
+    box-shadow: 0 0 0px 1000px #111118 inset !important;
+    -moz-text-fill-color: #fff !important;
+}
+
+.input-box input:focus{
+  outline:none;
+  border-color:#0ff;
+  box-shadow:0 0 12px rgba(0,255,240,.35);
+}
+
+.btn{
+  width:100%;
+  height:54px;
+  border:none;
+  border-radius:16px;
+  background:#00fff0;
+  color:#0a0a0f;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.3s;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-decoration:none;
+}
+
+.btn:hover{
+  box-shadow:0 0 20px rgba(0,255,240,.6);
+}
+
+#modalAlert{
+  display:none;
+  text-align:center;
+  margin-bottom:12px;
+  padding:8px 12px;
+  border-radius:12px;
+  font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<div class="modal-card">
+  <h1>Reset Password</h1>
+  <p>Enter your username/email and new password</p>
+
+  <div id="modalAlert"></div>
+
+  <div class="form-group">
+    <label>Username or Email</label>
+    <div class="input-box">
+      <i class="fa-solid fa-user"></i>
+      <input type="text" id="resetId" placeholder="Enter username or email" autocomplete="username">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>New Password</label>
+    <div class="input-box">
+      <i class="fa-solid fa-lock"></i>
+      <input type="password" id="newPassword" placeholder="New password" autocomplete="new-password">
+      <i class="fa-solid fa-eye toggle-password"></i>
+    </div>
+  </div>
+
+  <button class="btn" onclick="resetPassword()">Reset Password</button>
+  <a href="log.html" class="btn" style="background:#333;color:#0ff;margin-top:10px;">Back to Login</a>
+</div>
+
+<script>
+const modalAlert = document.getElementById("modalAlert");
+const newPassword = document.getElementById("newPassword");
+const togglePassword = document.querySelector(".toggle-password");
+
+togglePassword.addEventListener("click", e=>{
+  newPassword.type = newPassword.type==="password"?"text":"password";
+  e.target.classList.toggle("fa-eye-slash");
+});
+
+function resetPassword(){
+  const id = document.getElementById("resetId").value.trim().toLowerCase();
+  const newPass = newPassword.value;
+
+  if(!id || !newPass){
+    showModalMessage("All fields are required","error");
+    return;
+  }
+
+  let key=null,user=null;
+  for(let k in localStorage){
+    if(k.startsWith("LUMIEARN_USER_")){
+      const u=JSON.parse(localStorage.getItem(k));
+      if(u.username.toLowerCase()===id || u.email===id){
+        key=k;
+        user=u;
+        break;
+      }
+    }
+  }
+
+  if(!user){
+    showModalMessage("Account not found","error");
+    return;
+  }
+
+  user.password=newPass;
+  localStorage.setItem(key, JSON.stringify(user));
+
+  showModalMessage("Password reset successful! You can now login.","success");
+  setTimeout(()=>window.location.href="log.html",2000);
+}
+
+function showModalMessage(msg,type){
+  modalAlert.style.display="block";
+  modalAlert.innerText = msg;
+  modalAlert.style.background = type==="error"?"#ff4d4d":"#0ff";
+  modalAlert.style.color = type==="error"?"#721c24":"#0a0a0f";
+}
+</script>
+
+</body>
+</html>

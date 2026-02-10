@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Dashboard</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+
+/* DARK MODE */
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  background: var(--sidebar);
+  position: fixed;
+  left: -250px;
+  top: 0;
+  height: 100%;
+  padding: 20px;
+  transition: .3s;
+  z-index: 1000;
+
+  overflow-y: auto;      /* <-- allow vertical scrolling */
+  overscroll-behavior: contain; /* optional: prevents body scrolling when sidebar scrolls */
+}
+.sidebar.active{left:0;}
+.sidebar h2{text-align:center;margin-bottom:25px;color:var(--accent);}
+
+/* MENU */
+:root {--menu-radius: 28px;}
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 0 var(--menu-radius) var(--menu-radius) 0;
+  transition: background 0.2s, border-radius 0.2s;
+}
+.menu-item:hover {background: rgba(0,0,0,.05);}
+.menu-left {display: flex; align-items: center; gap: 6px; text-decoration: none; color: var(--text);}
+
+/* SUBMENU */
+.submenu{display:none;flex-direction:column;padding-left:28px;}
+.submenu a{text-decoration:none;color:var(--accent);padding:10px 0;font-size:14px;}
+
+/* ACTIVE MENU ITEM */
+.menu-item a.active,
+.menu-item.open > .menu-left {
+  background: rgba(0,207,200,0.15);
+  color: var(--text);
+  width: 100%;
+  margin-left: -12px;
+  margin-right: -12px;
+  padding: 12px 20px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left: 10px solid var(--accent);
+  border-radius: 0 20px 20px 0;
+  box-sizing: border-box;
+}
+
+/* MAIN */
+.main{padding:20px;}
+
+/* HEADER BAR */
+.header{display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:12px 16px;border-radius:14px;margin-bottom:25px;box-shadow:0 6px 18px rgba(0,0,0,.08);border-left:4px solid var(--accent);}
+
+/* HAMBURGER */
+.menu-toggle{width:38px;height:38px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.menu-toggle span{width:18px;height:2px;background:#000;position:absolute;transition:.3s;}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+
+/* MODE BUTTON */
+.mode-btn{background:var(--card);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* WELCOME CARD */
+.welcome-card{background:linear-gradient(135deg,var(--accent),#0077ff);color:#fff;padding:25px;border-radius:18px;margin-bottom:30px;}
+.welcome-card h2{font-size:22px;margin-bottom:6px;}
+.welcome-card p{opacity:.9;margin-bottom:18px;}
+
+/* MINI CARDS */
+.mini-cards{display:flex;gap:15px;flex-wrap:wrap;}
+.mini-card{flex:1 1 140px;padding:20px;border-radius:16px;position:relative;box-shadow:0 6px 18px rgba(0,0,0,.08);}
+.mini-card h4{font-size:14px;margin-bottom:10px;}
+.mini-card h3{font-size:24px;font-weight:700;margin-bottom:6px;}
+
+/* STATS CARDS */
+.stats{display:flex;gap:20px;flex-wrap:wrap;}
+.stat-card{flex:1 1 250px;padding:20px;border-radius:16px;color:#fff;position:relative;box-shadow:0 6px 18px rgba(0,0,0,.08);}
+.stat-card h4{font-size:14px;margin-bottom:12px;}
+.stat-card h2{font-size:22px;font-weight:700;margin-bottom:6px;}
+.stat-card p{font-size:12px;opacity:0.85;}
+
+/* STATS CARD COLORS */
+.stat-card:nth-child(1){background:#0bd494;}   /* Current Balance - green */
+.stat-card:nth-child(2){background:#0fe3ff;}   /* Total Withdrawn - blue */
+.stat-card:nth-child(3){background:#0077ff;}   /* Pending Amount - blue */
+.stat-card:nth-child(4){background:#f1c40f;}   /* Welcome Bonus - dark yellow */
+.stat-card:nth-child(5){background:#808080;}   /* Deposit Balance - grey */
+.stat-card:nth-child(6){background:#ff69b4;}   /* Referral Bonus - pink */
+
+/* TASKS CARD */
+.task-card{background:#fff;color:#111;box-shadow:0 6px 18px rgba(0,0,0,.08);}
+.task-card h4{color:#111;margin-bottom:10px;}
+.task-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;}
+
+/* ICONS */
+.icon{position:absolute;top:20px;right:20px;font-size:30px;}
+
+/* BUTTONS FOR ACTIONS */
+.action-btn{margin-top:0; padding:6px 10px; border:none; background:#fff; color:#0077ff; font-weight:600; border-radius:8px; cursor:pointer;}
+.copy-action-btn{margin-top:0;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <strong>MENU</strong>
+  <div class="menu-item">
+    <a href="dashboard.html" class="menu-left"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+  </div>
+
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-whatsapp"></i><span>Whatsapp</span>
+    </a>
+  </div>
+
+  <div class="menu-item has-sub" id="Btn">
+    <div class="menu-left"><i class="fa-solid fa-gift"></i><span>Site Bonuses</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Welcome Bonus</a>
+    <a href="completed-tasks.html">Weekly Bonus</a>
+  </div>
+
+  <div class="menu-item has-sub" id="tasksBtn">
+    <div class="menu-left"><i class="fa-solid fa-list-check"></i><span>Daily Tasks</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Tasks Timetable</a>
+    <a href="completed-tasks.html">Completed Tasks</a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-wallet"></i><span>Deposit</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-user-plus"></i><span>Activate User</span>
+    </a>
+  </div>
+    <div class="menu-item has-sub" id="accountBtn">
+    <div class="menu-left"><i class="fa-solid fa-hand-holding-dollar"></i><span>Withdraw</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://lumiearn.vercel.app/user_profile.html">Withdraw balance</a>
+    <a href="completed-tasks.html">Withdraw youtube</a>
+    <a href="completed-tasks.html">Withdraw tiktok</a> 
+        <a href="completed-tasks.html">Withdraw surveys</a>
+    <a href="completed-tasks.html">Withdraw trivias</a> 
+  </div>
+
+  <div class="menu-item has-sub" id="downlinesBtn">
+    <div class="menu-left"><i class="fa-solid fa-users"></i><span>Downlines</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <div class="menu-left"><span>Level 1</span></div>
+    <a href="http://lumiearn.vercel.app/active1.html" id="checkLevel1">Active</a>
+    <a href="http://lumiearn.vercel.app/casino-spin.html" id="checkLevel1">Inactive</a>
+    <div class="menu-left"><span>Level 2</span></div>
+    <a href="http://lumiearn.vercel.app/active2.html" id="checkLevel2">Active</a>
+    <a href="http://lumiearn.vercel.app/casino-spin.html" id="checkLevel2">Inactive</a>
+    <div class="menu-left"><span>Level 3</span></div>
+    <a href="http://lumiearn.vercel.app/active3.html" id="checkLevel3">Active</a>
+    <a href="http://lumiearn.vercel.app/casino-spin.html" id="checkLevel3">Inactive</a>
+  </div>
+
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/tiktok.html" class="menu-left">
+      <i class="fa-brands fa-tiktok"></i><span>Tiktok Videos</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/youtube.html" class="menu-left">
+      <i class="fa-brands fa-youtube"></i><span>Youtube Videos</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/#.html" class="menu-left">
+      <i class="fa-solid fa-square-poll-vertical"></i><span>Daily Surveys</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/trivia.html" class="menu-left">
+      <i class="fa-solid fa-circle-question"></i><span>Trivia Quizzes</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/adds.html" class="menu-left">
+      <i class="fa-solid fa-video"></i><span>Ads Clicking</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/youtube.html" class="menu-left">
+      <i class="fa-solid fa-film"></i><span>Watch Movies</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-paperclip" style="font-size:22px;color:#555;"></i><span>Netflix Videos</span>
+    </a>
+  </div>
+    <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/aviator.html" class="menu-left">
+      <i class="fa-solid fa-plane-departure"></i><span>Aviator</span>
+    </a>
+  </div>
+
+  <div class="menu-item has-sub" id="spinBtn">
+    <div class="menu-left"><i class="fa-solid fa-dice"></i><span>Spins</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://lumiearn.vercel.app/free-spin.html" id="performSpin">Free Spin</a>
+    <a href="http://lumiearn.vercel.app/casino-spin.html" id="casinoLink">Casino</a>
+  </div>
+
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-facebook"></i><span>Fb meta Ads</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-brands fa-instagram"></i><span>Instagram Reels</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-user-group"></i><span>Lonely foreigners chat</span>
+    </a>
+  </div>
+  <div class="submenu">
+    <a href="lumiearn.vercel.app/profile.html">Profile</a>
+    <a href="security.html">Security</a>
+  </div>
+  <div class="menu-item">
+    <a href="withdrawals.html" class="menu-left"><i class="fa-solid fa-book"></i><span>E-Books</span></a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-gamepad"></i><span>Online Gaming</span>
+    </a>
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/lumiearn-youtubes.html" class="menu-left">
+      <i class="fa-solid fa-chart-line"></i><span>Forex Classes</span>
+    </a>
+  </div> 
+    <div class="menu-item has-sub" id="accountBtn">
+    <div class="menu-left"><i class="fa-solid fa-user"></i><span>Account</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://lumiearn.vercel.app/user_profile.html">User Profile</a>
+    <a href="completed-tasks.html">Download App</a>
+    <a href="completed-tasks.html">Share Link</a> 
+  </div>
+  <div class="menu-item">
+    <a href="http://lumiearn.vercel.app/login.html" class="menu-left"><i class="fa-solid fa-power-off"></i><span>Logout</span></a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<!-- MAIN -->
+<div class="main">
+
+  <div class="header">
+    <div style="display:flex; align-items:center; width:38px;">
+      <div class="menu-toggle" id="menuToggle">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+<div class="brand">
+  <!-- Brand title -->
+  <span class="brand-name">LUMIEARN</span>
+</div>
+
+<style>
+.brand {
+  display: flex;
+  align-items: center; /* vertically aligns text */
+  font-family: Arial, sans-serif;
+  height: 40px;        /* match your header height */
+  
+  /* Option: move brand from the start */
+  padding-left: 46px;  /* adjust this value to move it forward */
+}
+
+.brand-name {
+  font-size: 25px;     /* text size */
+  font-weight: bold;
+  color: #1e1e1e;
+  line-height: 1;
+}
+</style>
+
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <div style="display:flex; align-items:center; gap:8px;">
+      <img id="countryFlag" src="" alt="Country"
+           style="width:28px;height:20px;border-radius:4px;">
+      <button class="mode-btn" id="modeBtn">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <img id="dashboardAvatar"
+           src="https://i.pravatar.cc/150?u=user"
+           style="width:38px;height:38px;border-radius:50%;
+                  object-fit:cover;cursor:pointer;
+                  border:2px solid var(--accent);">
+    </div>
+  </div>
+
+  <!-- WELCOME CARD -->
+  <div class="welcome-card">
+    <h2>Welcome back, <span id="username">User</span>     <i class="fas fa-check-circle verified-badge" title="Verified account"></i></h2>
+    <p>Your journey to a thousand milestones has now started. Welcome on board champion and unlock huge targets with us.</p>
+    <div class="mini-cards">
+      <div class="mini-card" id="capitalCard" style="background:#00cfc8;color:#fff;">
+        <h4>Capital</h4>
+        <h3 id="capitalWallet">0</h3>
+      </div>
+      <div class="mini-card" id="profitCard" style="background:#0077ff;color:#fff;">
+        <h4>Profit</h4>
+        <h3 id="profitWallet">0</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <h4>Current Balance</h4>
+      <h2>0</h2>
+      <p>Available Withdrawal</p>
+      <i class="icon fa-solid fa-building-columns"></i>
+    </div>
+    <div class="stat-card">
+      <h4>Total Withdrawn</h4>
+      <h2>0</h2>
+      <p>Total Cashed Out</p>
+      <i class="icon fa-solid fa-sack-dollar"></i>
+    </div>
+    <div class="stat-card">
+      <h4>Pending Amount</h4>
+      <h2>0</h2>
+      <p>Waiting Disbursement</p>
+      <i class="icon fa-solid fa-clock"></i>
+    </div>
+    <div class="stat-card">
+      <h4>Welcome Bonus</h4>
+      <h2>0</h2>
+      <p>Available for Claim</p>
+      <i class="icon fa-solid fa-gift"></i>
+    </div>
+    <div class="stat-card">
+      <h4>Deposit Balance</h4>
+      <h2>0</h2>
+      <p>Available for Spin and Activation</p>
+      <i class="icon fa-solid fa-coins"></i>
+    </div>
+    <div class="stat-card">
+      <h4>Referral Bonus</h4>
+      <h2 id="refBonus">0</h2>
+      <p>Share your links and earn commission</p>
+      <div style="margin-top:10px; display:flex; gap:6px;">
+        <input type="text" id="mainRefLink" readonly style="flex:1; padding:6px; border-radius:8px; border:none; text-align:center;" />
+        <button class="copy-action-btn action-btn" id="copyMainRef">Copy</button>
+      </div>
+      <div style="margin-top:10px; display:flex; gap:6px;">
+      </div>
+    </div>
+
+    <!-- TASKS EARNINGS CARD -->
+    <div class="stat-card task-card">
+      <h4>Task Earnings</h4>
+      <div class="task-row"><span>YouTube Ads</span><strong id="taskYoutube">+0</strong></div>
+      <div class="task-row"><span>TikTok Ads</span><strong id="taskTiktok">+0</strong></div>
+      <div class="task-row"><span>Trivia</span><strong id="taskTrivia">+0</strong></div>
+      <div class="task-row"><span>Surveys</span><strong id="taskSurveys">+0</strong></div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+  /* ===== CONFIG & CURRENCY ===== */
+  const countrySettings = {
+    'Kenya': {currencyCode:'KSH', startingCapital:300, startingProfit:100},
+    'Uganda': {currencyCode:'UGX', startingCapital:18500, startingProfit:4000},
+    'Tanzania': {currencyCode:'TZS', startingCapital:14000, startingProfit:2500},
+    'United States': {currencyCode:'USD', startingCapital:8, startingProfit:2},
+    'Ghana': {currencyCode:'GHS', startingCapital:80, startingProfit:25}
+  };
+  function formatCurrency(amount, currencyCode){
+    return `${currencyCode} ${Number(amount).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2})}`;
+  }
+
+  /* ===== USER DATA ===== */
+  const username = localStorage.getItem("LUMIEARN_LOGGED_IN");
+  if(!username) location.href="login.html";
+  const userData = JSON.parse(localStorage.getItem("LUMIEARN_USER_"+username.toLowerCase())) || {};
+  const settings = countrySettings[userData.country] || countrySettings['United States'];
+  const currency = settings.currencyCode;
+
+// ===== WALLET INIT =====
+let wallet = JSON.parse(localStorage.getItem(`wallet_${username}`)) || {};
+wallet.balance = wallet.balance ?? 0;
+wallet.capital = wallet.capital ?? settings.startingCapital;
+wallet.deposit = wallet.deposit ?? 0;
+wallet.pending = wallet.pending ?? 0;
+wallet.totalWithdrawn = wallet.totalWithdrawn ?? 0;
+wallet.welcomeBonus = wallet.welcomeBonus ?? settings.startingProfit;
+wallet.referralBonus = wallet.referralBonus ?? 0;
+
+// profit now includes EVERYTHING earned so far
+wallet.profit = wallet.deposit + wallet.welcomeBonus + wallet.referralBonus;
+
+// ===== TASK EARNINGS =====
+const tasks = {Youtube:'LUMIEARN_TASK_Youtube',Tiktok:'LUMIEARN_TASK_Tiktok',Trivia:'LUMIEARN_TASK_Trivia',Surveys:'LUMIEARN_TASK_Surveys'};
+let totalTaskProfit = 0;
+for(const task in tasks){
+  const val = Number(localStorage.getItem(tasks[task]) || 0);
+  document.getElementById("task"+task).textContent = "+"+formatCurrency(val,currency);
+  totalTaskProfit += val;
+}
+wallet.profit += totalTaskProfit;
+
+// ===== MLM LEVELS =====
+const VIEW_LEVELS = [1,2,3];
+
+function convertCurrency(amount, from, to){
+  const rates = {USD:1,KSH:160,UGX:3900,TZS:2500,GHS:10};
+  if(!rates[from]||!rates[to]) return 0;
+  return Math.floor((amount/rates[from])*rates[to]);
+}
+
+function getAllUsers(){
+  return Object.keys(localStorage)
+    .filter(k=>k.startsWith("LUMIEARN_USER_"))
+    .map(k=>JSON.parse(localStorage.getItem(k)));
+}
+
+function getNthUpline(username, level){
+  let current=username.toLowerCase();
+  for(let i=0;i<level;i++){
+    const u=JSON.parse(localStorage.getItem("LUMIEARN_USER_"+current));
+    if(!u || !u.referredBy) return null;
+    current = u.referredBy.toLowerCase();
+  }
+  return current;
+}
+
+const allUsers = getAllUsers();
+let totalMLMEarnings = 0;
+
+VIEW_LEVELS.forEach(level=>{
+  allUsers.forEach(user=>{
+    if(getNthUpline(user.username, level) !== username.toLowerCase()) return;
+
+    const earned = user.mlmRewards?.[`l${level}`] || 0;
+    const userCurr = user.currency || "USD";
+    const convertedEarned = convertCurrency(earned, userCurr, currency);
+
+    // Check if this MLM reward has already been added
+    const mlmKey = `MLM_ADDED_${username}_${user.username}_L${level}`;
+    if(!localStorage.getItem(mlmKey)){
+      totalMLMEarnings += convertedEarned;
+      localStorage.setItem(mlmKey, "1"); // mark as added
+    }
+  });
+});
+
+// Add MLM earnings once
+wallet.profit += totalMLMEarnings;
+wallet.referralBonus += totalMLMEarnings;
+wallet.balance += totalMLMEarnings;
+// save updated wallet
+localStorage.setItem(`wallet_${username}`, JSON.stringify(wallet));
+
+  /* ===== DASHBOARD UPDATE ===== */
+  document.getElementById("username").textContent = username;
+  document.querySelector(".stat-card:nth-child(1) h2").textContent = formatCurrency(wallet.balance,currency);
+  document.querySelector(".stat-card:nth-child(2) h2").textContent = formatCurrency(wallet.totalWithdrawn,currency);
+  document.querySelector(".stat-card:nth-child(3) h2").textContent = formatCurrency(wallet.pending,currency);
+  document.querySelector(".stat-card:nth-child(4) h2").textContent = formatCurrency(wallet.welcomeBonus,currency);
+  document.querySelector(".stat-card:nth-child(5) h2").textContent = formatCurrency(wallet.deposit,currency);
+  document.querySelector(".stat-card:nth-child(6) h2").textContent = formatCurrency(wallet.referralBonus,currency);
+  document.getElementById("capitalWallet").textContent = formatCurrency(wallet.capital,currency);
+  document.getElementById("profitWallet").textContent = formatCurrency(wallet.profit,currency);
+
+  /* ===== COUNTRY FLAG ===== */
+  const countryFlags = {
+    'Kenya':'https://flagcdn.com/w20/ke.png',
+    'Uganda':'https://flagcdn.com/w20/ug.png',
+    'Tanzania':'https://flagcdn.com/w20/tz.png',
+    'United States':'https://flagcdn.com/w20/us.png',
+    'Ghana':'https://flagcdn.com/w20/gh.png'
+  };
+  const flagImg = document.getElementById('countryFlag');
+  if(flagImg && countryFlags[userData.country]) flagImg.src = countryFlags[userData.country];
+
+  /* ===== REFERRAL LINK ===== */
+  const mainReferral = `${location.origin}/register.html?ref=${username}`;
+  const refInput = document.getElementById('mainRefLink');
+  if(refInput) refInput.value = mainReferral;
+  document.querySelectorAll(".copy-action-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      navigator.clipboard.writeText(refInput.value).then(()=>alert("Referral link copied!")).catch(()=>alert("Failed to copy link."));
+    });
+  });
+
+  /* ===== SIDEBAR / HAMBURGER ===== */
+  const menuToggle=document.getElementById("menuToggle");
+  const sidebar=document.getElementById("sidebar");
+  menuToggle.onclick=()=>{sidebar.classList.toggle("active");menuToggle.classList.toggle("active");};
+  document.addEventListener("click",e=>{
+    if(!sidebar.contains(e.target)&&!menuToggle.contains(e.target)){
+      sidebar.classList.remove("active");
+      menuToggle.classList.remove("active");
+    }
+  });
+  /* ===== SUBMENU TOGGLE ===== */
+document.querySelectorAll(".menu-item.has-sub").forEach(item => {
+  const submenu = item.nextElementSibling;
+  const toggleIcon = item.querySelector(".toggle-icon");
+
+  if(!submenu) return;
+
+  item.addEventListener("click", e => {
+    e.stopPropagation(); // prevent bubbling
+
+    // Close other open submenus
+    document.querySelectorAll(".menu-item.has-sub").forEach(i => {
+      if(i !== item){
+        i.classList.remove("open");
+        if(i.nextElementSibling) i.nextElementSibling.style.display = "none";
+        const icon = i.querySelector(".toggle-icon");
+        if(icon) icon.style.transform = "rotate(0deg)";
+      }
+    });
+
+    // Toggle current submenu
+    const isOpen = item.classList.toggle("open");
+    submenu.style.display = isOpen ? "flex" : "none";
+    if(toggleIcon) toggleIcon.style.transform = isOpen ? "rotate(180deg)" : "rotate(0deg)";
+  });
+});
+
+/* Optional: Close submenus if clicking outside sidebar */
+document.addEventListener("click", e => {
+  const sidebar = document.getElementById("sidebar");
+  if(!sidebar.contains(e.target)){
+    document.querySelectorAll(".menu-item.has-sub").forEach(item => {
+      item.classList.remove("open");
+      if(item.nextElementSibling) item.nextElementSibling.style.display = "none";
+      const icon = item.querySelector(".toggle-icon");
+      if(icon) icon.style.transform = "rotate(0deg)";
+    });
+  }
+});
+});
+
+  const paidToken = localStorage.getItem("lumiearn_paid");
+
+  if (!paidToken) {
+    // ❌ No payment → send back
+    window.location.href = "/mpesa.html";
+  }
+
+</script>
+<!-- FOOTER -->
+<footer style="text-align:center; padding:15px; font-size:14px; background:#f1f1f1;">
+  Copyright © 2026 
+  <strong><a href="#" target="_blank" style="color:inherit;">LUMIEARN</a></strong>. 
+  Designed with ❤️ by 
+  <strong><a href="#" target="_blank" style="color:#4da6ff;">BestChoice Management</a></strong>. 
+  All rights reserved.
+</footer>
+</body>
+</html>

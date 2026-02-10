@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Watch TikTok</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  background: var(--sidebar);
+  position: fixed;
+  left: -250px;
+  top: 0;
+  height: 100%;
+  padding: 20px;
+  transition: .3s;
+  z-index: 1000;
+  overflow-y:auto;
+}
+.sidebar.active{left:0;}
+.sidebar h2{text-align:center;margin-bottom:25px;color:var(--accent);}
+.menu-item {display:flex;align-items:center;justify-content:space-between;padding:12px;cursor:pointer;border-radius:0 28px 28px 0;}
+.menu-item:hover {background: rgba(0,0,0,.05);}
+.menu-left {display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);}
+.submenu{display:none;flex-direction:column;padding-left:28px;}
+.submenu a{text-decoration:none;color:var(--accent);padding:10px 0;font-size:14px;}
+.menu-item a.active,.menu-item.open>.menu-left{background: rgba(0,207,200,0.15); color: var(--text); width:100%; margin-left:-12px; margin-right:-12px; padding:12px 20px; min-height:40px; display:flex;align-items:center;gap:10px; border-left:10px solid var(--accent); border-radius:0 20px 20px 0;}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:12px 16px;border-radius:14px;margin-bottom:25px;box-shadow:0 6px 18px rgba(0,0,0,.08);border-left:4px solid var(--accent);}
+.menu-toggle{width:38px;height:38px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.menu-toggle span{width:18px;height:2px;background:#000;position:absolute;transition:.3s;}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+.mode-btn{background:var(--card);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* BRAND */
+.brand {display:flex;align-items:center;font-family:Arial,sans-serif;height:40px;padding-left:46px;}
+.brand-name{font-size:25px;font-weight:bold;color:#1e1e1e;line-height:1;}
+
+/* MAIN CONTENT */
+.main{padding:20px;margin-left:0;transition:.3s;flex:1;display:flex;flex-direction:column;}
+
+/* VIDEO GRID */
+.ad-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:15px;
+}
+.ad-card{
+  background:var(--card);
+  padding:15px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+.ad-card iframe{
+  width:100%;
+  height:300px;
+  border:none;
+  border-radius:10px;
+}
+.ad-card button{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+}
+
+/* WIN NOTIFICATION */
+.win-notification{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:var(--accent);
+  color:#fff;
+  padding:12px 18px;
+  border-radius:10px;
+  opacity:0;
+  transition:.3s;
+  z-index:9999;
+}
+.win-notification.show{ opacity:1;}
+
+/* FOOTER */
+footer{text-align:center;padding:15px;font-size:14px;background:#f1f1f1;margin-top:auto;}
+footer a{text-decoration:none;color:inherit;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h2>LUMIEARN MENU</h2>
+  <div class="menu-item"><a href="dashboard.html" class="menu-left"><i class="fa-solid fa-house"></i><span>Dashboard</span></a></div>
+  <div class="menu-item"><a href="tiktok.html" class="menu-left"><i class="fa-brands fa-tiktok"></i><span>Watch TikTok</span></a></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="header">
+    <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+    <div class="brand"><span class="brand-name">LUMIEARN</span></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <img id="countryFlag" src="https://flagcdn.com/w20/ke.png" style="width:28px;height:20px;border-radius:4px;">
+      <button class="mode-btn" id="modeBtn"><i class="fa-solid fa-moon"></i></button>
+      <img id="dashboardAvatar" src="https://i.pravatar.cc/150?u=user" style="width:38px;height:38px;border-radius:50%;border:2px solid var(--accent);">
+    </div>
+  </div>
+
+  <h2>Watch TikTok & Earn</h2>
+  <div class="ad-grid" id="adGrid"></div>
+</div>
+
+<div class="win-notification" id="winNotification"><span id="winMessage"></span></div>
+
+<footer>
+  Copyright © 2026 <strong>LUMIEARN</strong>. Designed with ❤️ by <strong>BestChoice Management</strong>.
+</footer>
+
+<script>
+// SIDEBAR
+const menuToggle = document.getElementById("menuToggle");
+const sidebar = document.getElementById("sidebar");
+menuToggle.onclick = () => {sidebar.classList.toggle("active"); menuToggle.classList.toggle("active");};
+document.addEventListener("click", e => {if(!sidebar.contains(e.target) && !menuToggle.contains(e.target)){sidebar.classList.remove("active");menuToggle.classList.remove("active");}});
+
+// DARK MODE
+document.getElementById("modeBtn").onclick = ()=>{document.body.classList.toggle("dark");};
+
+// USER WALLET
+const username = localStorage.getItem("LUMIEARN_LOGGED_IN")||"User";
+let wallet = JSON.parse(localStorage.getItem(`wallet_${username}`)) || {profit:0};
+
+// TikTok videos (example embeds)
+const tiktokVideos = [
+  {id:1,url:"https://www.tiktok.com/embed/7201234567890123456"},
+  {id:2,url:"https://www.tiktok.com/embed/7202345678901234567"},
+  {id:3,url:"https://www.tiktok.com/embed/7203456789012345678"}
+];
+
+// Randomly populate grid
+function populateTikTok(){
+  const adGrid = document.getElementById("adGrid");
+  adGrid.innerHTML = tiktokVideos.map(v=>{
+    const done = localStorage.getItem(`watched_tiktok_${username}_${v.id}`);
+    return `<div class="ad-card">
+      <iframe src="${v.url}" allowfullscreen></iframe>
+      <button ${done?"disabled":""} data-id="${v.id}">${done?"Watched":"Watch & Earn Ksh 25"}</button>
+    </div>`;
+  }).join("");
+}
+populateTikTok();
+
+// Earning logic: only Wednesdays
+const today = new Date().getDay(); // 3 = Wednesday
+const isEarningDay = () => today === 3;
+
+document.getElementById("adGrid").addEventListener("click", e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  const btn = e.target;
+  const card = btn.closest(".ad-card");
+  const id = btn.dataset.id;
+  btn.disabled = true;
+  btn.textContent = "Watching...";
+  
+  setTimeout(()=>{
+    if(!isEarningDay()){
+      show("Earning available only on Wednesday");
+      btn.disabled = false;
+      btn.textContent = "Watch & Earn Ksh 25";
+      return;
+    }
+    localStorage.setItem(`watched_tiktok_${username}_${id}`,"true");
+    wallet.profit += 25;
+    localStorage.setItem(`wallet_${username}`, JSON.stringify(wallet));
+    btn.textContent = "Watched";
+    show("Ksh 25 added to your profit!");
+  },15000); // simulate 15s watch
+});
+
+// Notification
+function show(msg){
+  const win = document.getElementById("winNotification");
+  document.getElementById("winMessage").textContent = msg;
+  win.classList.add("show");
+  setTimeout(()=>win.classList.remove("show"),3000);
+}
+</script>
+</body>
+</html>

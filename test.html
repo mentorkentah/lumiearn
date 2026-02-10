@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Dashboard</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+
+/* DARK MODE */
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#ffffff;
+}
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:250px;
+  background:var(--sidebar);
+  position:fixed;
+  left:-250px;
+  top:0;
+  height:100%;
+  padding:20px;
+  transition:.3s;
+  z-index:1000;
+}
+.sidebar.active{left:0;}
+
+.sidebar h2{
+  text-align:center;
+  margin-bottom:25px;
+  color:var(--accent);
+}
+
+/* MENU */
+.menu-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+}
+.menu-item:hover{background:rgba(0,0,0,.05);}
+
+.menu-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:var(--text);
+}
+
+/* SUBMENU */
+.submenu{
+  display:none;
+  flex-direction:column;
+  padding-left:28px;
+}
+.submenu a{
+  text-decoration:none;
+  color:var(--accent);
+  padding:6px 0;
+  font-size:14px;
+}
+
+/* Remove rotation of toggle icon */
+.toggle-icon{
+  transition:.3s;
+}
+
+/* ACTIVE MENU ITEM */
+.menu-item a.active,
+.menu-item.open > .menu-left {
+  background: rgba(0, 207, 200, 0.15);
+  border-left: 10px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+}
+.menu-item a.active span {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* MAIN */
+.main{
+  padding:20px;
+}
+
+/* HEADER BAR */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--card);
+  padding:12px 16px;
+  border-radius:14px;
+  margin-bottom:25px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  border-left:4px solid var(--accent);
+}
+
+/* HAMBURGER */
+.menu-toggle{
+  width:38px;
+  height:38px;
+  border-radius:8px;
+  background:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  position:relative;
+}
+
+.menu-toggle span{
+  width:18px;
+  height:2px;
+  background:#000;
+  position:absolute;
+  transition:.3s;
+}
+body.dark .menu-toggle span{background:#fff;}
+
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+
+.menu-toggle.active span:nth-child(1){
+  top:18px;
+  transform:rotate(45deg);
+}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){
+  top:18px;
+  transform:rotate(-45deg);
+}
+
+/* MODE BUTTON */
+.mode-btn{
+  background:var(--card);
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* WELCOME CARD */
+.welcome-card{
+  background:linear-gradient(135deg, var(--accent), #0077ff);
+  color:#fff;
+  padding:25px;
+  border-radius:18px;
+  margin-bottom:30px;
+}
+
+.welcome-card h2{
+  font-size:22px;
+  margin-bottom:6px;
+}
+.welcome-card p{
+  opacity:.9;
+  margin-bottom:18px;
+}
+
+/* MINI CARDS */
+.mini-cards{
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
+.mini-card{
+  flex:1 1 140px;
+  padding:20px;
+  border-radius:16px;
+  position:relative;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+.mini-card h4{
+  font-size:14px;
+  margin-bottom:10px;      
+}
+
+.mini-card h3{
+  font-size:24px;     
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+/* STATS CARDS */
+.stats{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.stat-card{
+  flex:1 1 250px;
+  padding:20px;
+  border-radius:16px;
+  color:#fff;
+  position:relative;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+.stat-card h4{
+  font-size:14px;           
+  margin-bottom:12px;       
+}
+.stat-card h2{
+  font-size:22px;    
+  font-weight:700;
+  margin-bottom:6px;
+}
+.stat-card p{
+  font-size:12px;           
+  opacity:0.85;
+}
+
+.stat-card:nth-child(1){background:#009933;}
+.stat-card:nth-child(2){background:#b80909;}
+.stat-card:nth-child(3){background:#001f7a;}
+
+.icon{
+  position:absolute;
+  top:20px;
+  right:20px;
+  font-size:30px;
+}
+
+/* BUTTONS FOR ACTIONS */
+.action-btn{
+  margin-top:10px;
+  padding:8px 12px;
+  border:none;
+  background:#fff;
+  color:#0077ff;
+  font-weight:600;
+  border-radius:8px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h2>LUMIEARN</h2>
+
+  <div class="menu-item">
+    <a href="dashboard.html" class="menu-left"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+  </div>
+
+  <div class="menu-item has-sub" id="tasksBtn">
+    <div class="menu-left"><i class="fa-solid fa-list-check"></i><span>Tasks</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="task-list.html">Task List</a>
+    <a href="completed-tasks.html">Completed Tasks</a>
+  </div>
+
+  <div class="menu-item has-sub" id="spinBtn">
+    <div class="menu-left"><i class="fa-solid fa-dice"></i><span>Spin</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="http://localhost:8158/free-spin.html" id="performSpin">Free Spin</a>
+    <a href="http://localhost/casino-spin.html" id="casinoLink">Casino</a>
+  </div>
+
+  <div class="menu-item has-sub" id="depositBtn">
+    <div class="menu-left"><i class="fa-solid fa-credit-card"></i><span>Deposit</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="deposit.html">Deposit Funds</a>
+  </div>
+
+  <div class="menu-item has-sub" id="accountBtn">
+    <div class="menu-left"><i class="fa-regular fa-user"></i><span>Account</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <a href="profile.html">Profile</a>
+    <a href="security.html">Security</a>
+  </div>
+
+  <div class="menu-item">
+    <a href="withdrawals.html" class="menu-left"><i class="fa-solid fa-hand-holding-dollar"></i><span>Withdrawals</span></a>
+  </div>
+
+  <div class="menu-item">
+    <a href="log.html" class="menu-left"><i class="fa-solid fa-power-off"></i><span>Logout</span></a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+    <strong>LUMIEARN</strong>
+    <button class="mode-btn" id="modeBtn"><i class="fa-solid fa-moon"></i></button>
+  </div>
+
+  <!-- WELCOME CARD -->
+  <div class="welcome-card">
+    <h2>Welcome back, <span id="username">User</span> 👋</h2>
+    <p>Start your earning journey with us</p>
+
+    <div class="mini-cards">
+      <div class="mini-card" id="capitalCard" style="background:#00cfc8; color:#fff;">
+        <h4>Capital</h4>
+        <h3 id="capitalWallet">KES 500</h3>
+      </div>
+      <div class="mini-card" id="profitCard" style="background:#0077ff; color:#fff;">
+        <h4>Profit</h4>
+        <h3 id="profitWallet">KES 350</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <h4>Current Balance</h4>
+      <h2>KES 0</h2>
+      <p>Available Withdrawal</p>
+      <i class="icon fa-solid fa-building-columns"></i>
+    </div>
+
+    <div class="stat-card">
+      <h4>Total Withdrawn</h4>
+      <h2>KES 0</h2>
+      <p>Total Cashed Out</p>
+      <i class="icon fa-solid fa-sack-dollar"></i>
+    </div>
+
+    <div class="stat-card">
+      <h4>Pending Amount</h4>
+      <h2>KES 0</h2>
+      <p>Waiting Disbursement</p>
+      <i class="icon fa-solid fa-clock"></i>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* --- SIDEBAR TOGGLE --- */
+const menuToggle = document.getElementById("menuToggle");
+const sidebar = document.getElementById("sidebar");
+menuToggle.onclick = ()=>{
+  sidebar.classList.toggle("active");
+  menuToggle.classList.toggle("active");
+};
+document.addEventListener("click", e=>{
+  if(!sidebar.contains(e.target) && !menuToggle.contains(e.target)){
+    sidebar.classList.remove("active");
+    menuToggle.classList.remove("active");
+  }
+});
+
+/* --- SUBMENU TOGGLE --- */
+const submenuButtons = document.querySelectorAll(".menu-item.has-sub");
+submenuButtons.forEach(btn=>{
+  btn.addEventListener("click", e=>{
+    // Only toggle submenu if the click is NOT on a link
+    if(e.target.tagName.toLowerCase() !== 'a'){
+      e.preventDefault(); 
+      submenuButtons.forEach(other=>{
+        if(other!==btn){
+          other.classList.remove("open");
+          if(other.nextElementSibling && other.nextElementSibling.classList.contains("submenu")){
+            other.nextElementSibling.style.display="none";
+          }
+        }
+      });
+      btn.classList.toggle("open");
+      const submenu = btn.nextElementSibling;
+      if(submenu && submenu.classList.contains("submenu")){
+        submenu.style.display = submenu.style.display==="flex" ? "none" : "flex";
+      }
+    }
+  });
+});
+
+/* --- DARK MODE --- */
+document.getElementById("modeBtn").onclick = ()=>{
+  document.body.classList.toggle("dark");
+};
+
+/* --- USER & WALLETS --- */
+const username = localStorage.getItem("LUMIEARN_LOGGED_IN") || "User";
+document.getElementById("username").textContent = username;
+
+let userWallet = JSON.parse(localStorage.getItem(`wallet_${username}`)) || {};
+userWallet.balance = userWallet.balance ?? 0;
+userWallet.pending = userWallet.pending ?? 0;
+userWallet.totalWithdrawn = userWallet.totalWithdrawn ?? 0;
+userWallet.capital = userWallet.capital ?? 500;
+userWallet.profit = userWallet.profit ?? 350;
+userWallet.referrals = userWallet.referrals ?? [];
+userWallet.level2Referrals = userWallet.level2Referrals ?? [];
+userWallet.level3Referrals = userWallet.level3Referrals ?? [];
+localStorage.setItem(`wallet_${username}`, JSON.stringify(userWallet));
+
+function updateDashboard(){
+  document.querySelector(".stat-card:nth-child(1) h2").textContent = `KES ${userWallet.balance}`;
+  document.querySelector(".stat-card:nth-child(2) h2").textContent = `KES ${userWallet.totalWithdrawn}`;
+  document.querySelector(".stat-card:nth-child(3) h2").textContent = `KES ${userWallet.pending}`;
+  document.getElementById("capitalWallet").textContent = `KES ${userWallet.capital}`;
+  document.getElementById("profitWallet").textContent = `KES ${userWallet.profit}`;
+}
+updateDashboard();
+
+/* --- ACTIVE PAGE HIGHLIGHT --- */
+const sidebarLinks = document.querySelectorAll(".sidebar a");
+const currentPage = location.pathname.split("/").pop();
+
+sidebarLinks.forEach(link => {
+  const linkPage = link.getAttribute("href");
+  if(linkPage === currentPage){
+    link.classList.add("active");
+    const parent = link.closest(".submenu");
+    if(parent){
+      parent.style.display = "flex";
+      parent.previousElementSibling.classList.add("open");
+    }
+  }
+});
+</script>
+
+</body>
+</html>

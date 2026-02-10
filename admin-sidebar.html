@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Admin Dashboard</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* SIDEBAR (OVERLAY) */
+.sidebar{
+  width:250px;
+  background:var(--sidebar);
+  position:fixed;
+  left:-250px;
+  top:0;
+  height:100vh;
+  padding:20px;
+  transition:.3s;
+  overflow-y:auto;
+  z-index:2000;
+  box-shadow:4px 0 18px rgba(0,0,0,.15);
+}
+.sidebar.active{left:0;}
+
+.sidebar h2{
+  text-align:center;
+  margin-bottom:25px;
+  color:var(--accent);
+  font-size:20px;
+  font-weight:bold;
+}
+
+.menu-item{
+  padding:12px;
+  cursor:pointer;
+  border-radius:8px;
+}
+.menu-item:hover{background:rgba(0,0,0,.05);}
+.menu-left{
+  text-decoration:none;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:500;
+}
+
+/* MAIN */
+.main{
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--card);
+  padding:12px 20px;
+  border-radius:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  border-left:4px solid var(--accent);
+}
+
+/* BRAND */
+.brand{
+  font-size:24px;
+  font-weight:bold;
+  color:var(--accent);
+}
+
+/* HEADER RIGHT */
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* AVATAR */
+#dashboardAvatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  cursor:pointer;
+  object-fit:cover;
+}
+
+/* DARK MODE */
+.mode-btn{
+  background:var(--card);
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* HAMBURGER (4 CUBES) */
+.menu-toggle{
+  width:40px;
+  height:40px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  cursor:pointer;
+}
+.menu-toggle span{
+  width:18px;
+  height:18px;
+  background:var(--accent);
+  display:block;
+  transition:.3s;
+}
+.menu-toggle.active span:nth-child(1){transform:translate(0,10px) rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){transform:translate(0,-10px) rotate(-45deg);}
+.menu-toggle.active span:nth-child(4){opacity:0;}
+
+/* BACKDROP */
+.backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:1500;
+  display:none;
+}
+.backdrop.active{display:block;}
+</style>
+</head>
+
+<body>
+
+<!-- BACKDROP -->
+<div class="backdrop" id="backdrop"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h2>MENU</h2>
+
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-house"></i> Dashboard</a></div>
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-user"></i> Users</a></div>
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-gift"></i> Bonuses</a></div>
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-wallet"></i> Withdrawals</a></div>
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-cogs"></i> Settings</a></div>
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-chart-line"></i> Reports</a></div>
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-envelope"></i> Messages</a></div>
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-bell"></i> Notifications</a></div>
+  <div class="menu-item"><a href="#" class="menu-left"><i class="fa-solid fa-gear"></i> Advanced</a></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="menu-toggle" id="menuToggle">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="brand">LUMIEARN</div>
+    </div>
+
+    <div class="header-right">
+      <button class="mode-btn" id="modeBtn"><i class="fa-solid fa-moon"></i></button>
+      <img id="dashboardAvatar" src="https://i.pravatar.cc/150?u=user" alt="Avatar">
+    </div>
+  </div>
+</div>
+
+<script>
+const sidebar=document.getElementById("sidebar");
+const toggle=document.getElementById("menuToggle");
+const backdrop=document.getElementById("backdrop");
+
+/* TOGGLE SIDEBAR */
+toggle.onclick=(e)=>{
+  sidebar.classList.toggle("active");
+  toggle.classList.toggle("active");
+  backdrop.classList.toggle("active");
+  e.stopPropagation();
+};
+
+/* CLOSE ON BACKDROP */
+backdrop.onclick=()=>{
+  sidebar.classList.remove("active");
+  toggle.classList.remove("active");
+  backdrop.classList.remove("active");
+};
+
+/* DARK MODE */
+document.getElementById("modeBtn").onclick=()=>{
+  document.body.classList.toggle("dark");
+};
+</script>
+
+</body>
+</html>

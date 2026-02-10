@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Make Payment | LUMIEARN</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+body{margin:0;padding:0;font-family:'Orbitron',sans-serif;background:#0a0a0f;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;}
+.card{background:#111118;padding:30px 25px;border-radius:16px;text-align:center;max-width:400px;width:100%;box-shadow:0 0 20px rgba(0,255,240,0.25);}
+h2{color:#0ff;margin-bottom:12px;}
+p{margin-bottom:20px;color:#fff;}
+.amount, .phone{font-size:22px;font-weight:700;margin:8px 0;color:#00fff0;}
+button{background:#00fff0;color:#0a0a0f;border:none;padding:12px 25px;font-size:16px;border-radius:12px;cursor:pointer;transition:.3s;}
+button:hover{box-shadow:0 0 15px rgba(0,255,240,0.5);}
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>Complete Your Payment</h2>
+  <p>Send the amount below to your registered number</p>
+  <div class="amount" id="amount">0</div>
+  <div class="phone" id="phone">+000000000</div>
+  <p>Once paid, click the button below to confirm.</p>
+  <button id="paidBtn"><i class="fa-solid fa-check"></i> I Paid</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+  const username = localStorage.getItem("LUMIEARN_LOGGED_IN");
+  if(!username) location.href="login.html";
+
+  // Read stored payment info
+  const amount = localStorage.getItem("PAYMENT_AMOUNT") || 0;
+  const phone = localStorage.getItem("PAYMENT_PHONE") || "+000000000";
+
+  document.getElementById("amount").textContent = amount;
+  document.getElementById("phone").textContent = phone;
+
+  // Handle "I Paid" button
+  document.getElementById("paidBtn").addEventListener("click",()=>{
+    // Mark user as paid
+    const userDataKey = "LUMIEARN_USER_"+username.toLowerCase();
+    const userData = JSON.parse(localStorage.getItem(userDataKey));
+    if(userData){
+      userData.paid = true;
+      localStorage.setItem(userDataKey, JSON.stringify(userData));
+      alert("Payment confirmed! Redirecting to dashboard...");
+      location.href="dashboard.html";
+    }
+  });
+
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Admin Update Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
+body{background:#0a0a0f;color:#fff;min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:flex-start;gap:30px;}
+:root{--accent:#00fff0;--bg:#0a0a0f;--card:#111118;--text:#fff;}
+body.dark{--bg:#0a0a0f;--card:#111118;--text:#fff;}
+.profile-card{background:var(--card);padding:40px 35px;border-radius:18px;width:100%;max-width:420px;box-shadow:0 0 25px rgba(0,255,240,.25);}
+.profile-card h2,h3{color:var(--accent);margin-bottom:16px;text-align:center;}
+label{display:block;margin-bottom:8px;font-size:14px;color:var(--accent);}
+.input-box{position:relative;width:100%;margin-bottom:20px;}
+.input-box input{width:100%;height:50px;padding:0 44px;border-radius:14px;border:1px solid rgba(0,255,240,.4);background:transparent;color:#fff;font-size:15px;transition:border 0.3s, box-shadow 0.3s;}
+.input-box input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 12px rgba(0,255,240,.35);}
+.input-box i{position:absolute;top:50%;transform:translateY(-50%);font-size:16px;color:var(--accent);}
+.input-box i:first-child{left:16px;}
+.toggle-password{right:16px;cursor:pointer;}
+input[readonly]{background:#334155;cursor:not-allowed;}
+.btn{width:100%;height:50px;border:none;border-radius:16px;background:var(--accent);color:#0a0a0f;font-weight:700;cursor:pointer;font-size:16px;margin-top:10px;transition:.3s;}
+.btn:hover{box-shadow:0 0 20px rgba(0,255,240,0.6);}
+hr{border-color:#334155;margin:25px 0;}
+#result{margin-top:20px;color:#22c55e;text-align:center;white-space:pre-wrap;}
+#mlmPopup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0f4d0f;color:#fff;border-radius:16px;padding:24px;z-index:9999;max-width:400px;width:90%;box-shadow:0 0 25px rgba(0,255,0,.4);}
+#mlmPopup h3{margin-bottom:12px;color:#00ff88;text-align:center;}
+#mlmPopup table{width:100%;border-collapse:collapse;margin-top:10px;}
+#mlmPopup table, #mlmPopup th, #mlmPopup td{border:1px solid #22c55e;}
+#mlmPopup th, #mlmPopup td{padding:6px 8px;text-align:center;font-size:13px;}
+#mlmPopup button{margin-top:12px;padding:6px 12px;border:none;border-radius:8px;background:#00ff88;color:#0a0a0f;cursor:pointer;}
+.main{width:100%;max-width:900px;flex:1;}
+.-card{background:linear-gradient(135deg,var(--accent),#0077ff);color:#fff;padding:25px;border-radius:18px;margin-bottom:30px;}
+.-card h2{font-size:22px;margin-bottom:6px;}
+.-card p{opacity:.9;margin-bottom:18px;}
+.mini-cards{display:flex;gap:15px;flex-wrap:wrap;}
+.mini-card{flex:1 1 140px;padding:20px;border-radius:16px;position:relative;box-shadow:0 6px 18px rgba(0,0,0,.08);}
+.mini-card h4{font-size:14px;margin-bottom:10px;}
+.mini-card h3{font-size:24px;font-weight:700;margin-bottom:6px;}
+.stats{display:flex;gap:20px;flex-wrap:wrap;}
+.stat-card{flex:1 1 250px;padding:20px;border-radius:16px;color:#fff;position:relative;box-shadow:0 6px 18px rgba(0,0,0,.08);}
+.stat-card h4{font-size:14px;margin-bottom:12px;}
+.stat-card h2{font-size:22px;font-weight:700;margin-bottom:6px;}
+.stat-card p{font-size:12px;opacity:0.85;}
+.stat-card:nth-child(1){background:#0bd494;}
+.stat-card:nth-child(2){background:#0fe3ff;}
+.stat-card:nth-child(3){background:#0077ff;}
+.stat-card:nth-child(4){background:#f1c40f;}
+.stat-card:nth-child(5){background:#808080;}
+.stat-card:nth-child(6){background:#ff69b4;}
+.task-card{background:#fff;color:#111;box-shadow:0 6px 18px rgba(0,0,0,.08);}
+.task-card h4{color:#111;margin-bottom:10px;}
+.task-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;}
+</style>
+</head>
+<body>
+
+<!-- PROFILE CARD -->
+<div class="profile-card">
+  <h2>Admin Update Panel</h2>
+  <form id="updateProfileForm">
+
+    <label>Username</label>
+    <div class="input-box"><i class="fa-solid fa-user"></i><input type="text" id="name" readonly></div>
+
+    <label>Upline</label>
+    <div class="input-box"><i class="fa-solid fa-user-plus"></i><input type="text" id="upline"></div>
+
+    <label>Email</label>
+    <div class="input-box"><i class="fa-solid fa-envelope"></i><input type="email" id="email" required></div>
+
+    <label>Phone Number</label>
+    <div class="input-box"><i class="fa-solid fa-phone"></i><input type="tel" id="phone" required></div>
+
+    <label>Country</label>
+    <div class="input-box"><i class="fa-solid fa-globe"></i><input type="text" id="country" required></div>
+
+    <hr>
+
+    <h3>Current Password</h3>
+    <div class="input-box">
+      <i class="fa-solid fa-lock"></i>
+      <input type="password" id="currentPassword" readonly>
+      <i class="fa-solid fa-eye toggle-password"></i>
+    </div>
+
+    <h3>Change Password</h3>
+    <div class="input-box"><i class="fa-solid fa-lock"></i><input type="password" id="newPassword" placeholder="New Password"></div>
+    <div class="input-box"><i class="fa-solid fa-lock"></i><input type="password" id="confirmPassword" placeholder="Confirm New Password"></div>
+
+    <button type="button" class="btn" onclick="updateProfile()">Update User</button>
+  </form>
+  <div id="result"></div>
+</div>
+
+<!-- MLM POPUP -->
+<div id="mlmPopup">
+  <h3>MLM Updates</h3>
+  <table>
+    <thead><tr><th>Level</th><th>Deducted User</th><th>Deducted Amount</th><th>Awarded User</th><th>Awarded Amount</th></tr></thead>
+    <tbody id="mlmTable"></tbody>
+  </table>
+  <button onclick="document.getElementById('mlmPopup').style.display='none'">Close</button>
+</div>
+
+<!-- DASHBOARD -->
+<div class="main">
+  <div class="-card">
+    <h2>User, <span id="dashboardName"></span> 👋</h2>
+    <p>Admin can update any user profile and wallet here.</p>
+    <div class="mini-cards">
+      <div class="mini-card" style="background:#00cfc8;"><h4>Capital</h4><h3 id="capitalWallet">0</h3></div>
+      <div class="mini-card" style="background:#0077ff;"><h4>Profit</h4><h3 id="profitWallet">0</h3></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat-card"><h4>Current Balance</h4><h2 id="currentBalance">0</h2><p>Available Withdrawal</p></div>
+    <div class="stat-card"><h4>Total Withdrawn</h4><h2 id="totalWithdrawn">0</h2><p>Total Cashed Out</p></div>
+    <div class="stat-card"><h4>Pending Amount</h4><h2 id="pendingAmount">0</h2><p>Waiting Disbursement</p></div>
+    <div class="stat-card"><h4>Bonus</h4><h2 id="bonusWallet">0</h2><p>Available for Claim</p></div>
+    <div class="stat-card"><h4>Deposit Balance</h4><h2 id="depositBalance">0</h2><p>Available for Spin and Activation</p></div>
+    <div class="stat-card"><h4>Referral Bonus</h4><h2 id="referralBonus">0</h2></div>
+    <div class="stat-card task-card">
+      <h4>Task Earnings</h4>
+      <div class="task-row"><span>YouTube Ads</span><strong id="taskYoutube">+0</strong></div>
+      <div class="task-row"><span>TikTok Ads</span><strong id="taskTiktok">+0</strong></div>
+      <div class="task-row"><span>Trivia</span><strong id="taskTrivia">+0</strong></div>
+      <div class="task-row"><span>Surveys</span><strong id="taskSurveys">+0</strong></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- COUNTRIES ---
+const countries = [
+  { name:'Kenya', currency:'KSH', capitalFee:500, startingProfit:150, mlmRewards:{l1:250,l2:100,l3:50} },
+  { name:'Uganda', currency:'UGX', capitalFee:18000, startingProfit:4000, mlmRewards:{l1:10000,l2:5000,l3:2000} },
+  { name:'Tanzania', currency:'TZS', capitalFee:14000, startingProfit:2500, mlmRewards:{l1:5000,l2:3000,l3:1000} },
+  { name:'United States', currency:'USD', capitalFee:8, startingProfit:2, mlmRewards:{l1:4,l2:2,l3:1} },
+  { name:'Ghana', currency:'GHS', capitalFee:80, startingProfit:20, mlmRewards:{l1:150,l2:75,l3:25} }
+];
+
+// --- FORMAT CURRENCY ---
+function formatCurrency(amount, currency){
+  return currency+" "+Number(amount).toLocaleString();
+}
+
+// --- CURRENCY CONVERTER ---
+function convertCurrency(amount, oldCountry, newCountry){
+  if(!oldCountry || !newCountry) return amount;
+  if(oldCountry.startingProfit === 0) return amount;
+  const rate = newCountry.startingProfit / oldCountry.startingProfit;
+  return Math.round(amount * rate);
+}
+
+// --- DASHBOARD UPDATE ---
+function updateDashboard(username){
+  const userData = JSON.parse(localStorage.getItem(`LUMIEARN_USER_${username.toLowerCase()}`)) || {};
+  let wallet = JSON.parse(localStorage.getItem(`wallet_${username}`)) || {};
+
+  const oldCountry = countries.find(c => c.name === wallet.oldCountry) || countries[3];
+  const newCountry = countries.find(c => c.name === userData.country) || countries[3];
+
+  wallet.capital = convertCurrency(wallet.capital || oldCountry.capitalFee, oldCountry, newCountry);
+  wallet.profit  = convertCurrency(wallet.profit || oldCountry.startingProfit, oldCountry, newCountry);
+  wallet.balance = convertCurrency(wallet.balance || 0, oldCountry, newCountry);
+  wallet.deposit = convertCurrency(wallet.deposit || 0, oldCountry, newCountry);
+  wallet.pending = convertCurrency(wallet.pending || 0, oldCountry, newCountry);
+  wallet.totalWithdrawn = convertCurrency(wallet.totalWithdrawn || 0, oldCountry, newCountry);
+  wallet.referralBonus = convertCurrency(wallet.referralBonus || 0, oldCountry, newCountry);
+  wallet.bonus = newCountry.startingProfit;
+  wallet.currency = newCountry.currency;
+  wallet.oldCountry = newCountry.name;
+
+  const tasks = ['Youtube','Tiktok','Trivia','Surveys'];
+  tasks.forEach(task=>{
+    let oldVal = Number(localStorage.getItem(`LUMIEARN_TASK_${task}_${username}`) || 0);
+    let newVal = convertCurrency(oldVal, oldCountry, newCountry);
+    document.getElementById("task"+task).textContent = "+" + formatCurrency(newVal, newCountry.currency);
+    localStorage.setItem(`LUMIEARN_TASK_${task}_${username}`, newVal);
+  });
+
+  localStorage.setItem(`wallet_${username}`, JSON.stringify(wallet));
+
+  document.getElementById("dashboardName").textContent = userData.username || username;
+  document.getElementById("capitalWallet").textContent = formatCurrency(wallet.capital, newCountry.currency);
+  document.getElementById("profitWallet").textContent = formatCurrency(wallet.profit, newCountry.currency);
+  document.getElementById("currentBalance").textContent = formatCurrency(wallet.balance, newCountry.currency);
+  document.getElementById("depositBalance").textContent = formatCurrency(wallet.deposit, newCountry.currency);
+  document.getElementById("pendingAmount").textContent = formatCurrency(wallet.pending, newCountry.currency);
+  document.getElementById("totalWithdrawn").textContent = formatCurrency(wallet.totalWithdrawn, newCountry.currency);
+  document.getElementById("bonusWallet").textContent = formatCurrency(wallet.bonus, newCountry.currency);
+  document.getElementById("referralBonus").textContent = formatCurrency(wallet.referralBonus, newCountry.currency);
+}
+
+// --- GET USERNAME FROM URL ---
+function getUsernameFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('user') || null;
+}
+
+// --- LOAD USER DATA ---
+function loadUserData(username){
+  if(!username){ document.getElementById("result").innerText = "No user specified in URL."; return; }
+  const key = "LUMIEARN_USER_" + username.toLowerCase();
+  const userData = JSON.parse(localStorage.getItem(key));
+  if(!userData){ alert("User not found"); return; }
+
+  document.getElementById("name").value = userData.username || username;
+  document.getElementById("upline").value = userData.referredBy || "";
+  document.getElementById("email").value = userData.email || "";
+  document.getElementById("phone").value = userData.phone || "";
+  document.getElementById("country").value = userData.country || "";
+
+  let wallet = JSON.parse(localStorage.getItem(`wallet_${username}`));
+  if(!wallet){
+    const countryData = countries.find(c => c.name === userData.country) || countries[3];
+    wallet = {
+      capital: countryData.capitalFee,
+      profit: countryData.startingProfit,
+      balance: 0,
+      deposit: 0,
+      pending: 0,
+      totalWithdrawn: 0,
+      referralBonus: 0,
+      bonus: countryData.startingProfit,
+      oldCountry: userData.country,
+      currency: countryData.currency
+    };
+    localStorage.setItem(`wallet_${username}`, JSON.stringify(wallet));
+  }
+
+  updateDashboard(username);
+}
+
+// --- PROFILE UPDATE ---
+function updateProfile(){
+  const username = document.getElementById("name").value.trim();
+  const newUpline = document.getElementById("upline").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const phone = document.getElementById("phone").value.trim();
+  const countryName = document.getElementById("country").value.trim();
+  const newPass = document.getElementById("newPassword").value;
+  const confirmPass = document.getElementById("confirmPassword").value;
+
+  if(newPass && newPass !== confirmPass){
+    document.getElementById("result").innerText = "Passwords do not match!";
+    return;
+  }
+
+  const key = "LUMIEARN_USER_" + username.toLowerCase();
+  let userData = JSON.parse(localStorage.getItem(key));
+  if(!userData){ alert("User not found"); return; }
+
+  const oldCountry = countries.find(c => c.name === userData.country) || countries[3];
+  const newCountry = countries.find(c => c.name === countryName) || countries[3];
+
+  const walletKey = `wallet_${username}`;
+  let wallet = JSON.parse(localStorage.getItem(walletKey)) || {};
+
+  // --- Preserve old wallet values and convert if country changes ---
+  wallet.capital = convertCurrency(wallet.capital || oldCountry.capitalFee, oldCountry, newCountry);
+  wallet.profit = convertCurrency(wallet.profit || oldCountry.startingProfit, oldCountry, newCountry);
+  wallet.balance = convertCurrency(wallet.balance || 0, oldCountry, newCountry);
+  wallet.deposit = convertCurrency(wallet.deposit || 0, oldCountry, newCountry);
+  wallet.pending = convertCurrency(wallet.pending || 0, oldCountry, newCountry);
+  wallet.totalWithdrawn = convertCurrency(wallet.totalWithdrawn || 0, oldCountry, newCountry);
+  wallet.referralBonus = convertCurrency(wallet.referralBonus || 0, oldCountry, newCountry);
+  wallet.bonus = newCountry.startingProfit;
+  wallet.currency = newCountry.currency;
+  wallet.oldCountry = newCountry.name;
+
+  // --- Update user info ---
+  userData.referredBy = newUpline;
+  userData.email = email;
+  userData.phone = phone;
+  userData.country = countryName;
+  if(newPass) userData.password = newPass;
+  localStorage.setItem(key, JSON.stringify(userData));
+  localStorage.setItem(walletKey, JSON.stringify(wallet));
+
+  // --- MLM Update Logic ---
+  function getUpline(username, level){
+    let current = username;
+    for(let i=0;i<level;i++){
+      const u = JSON.parse(localStorage.getItem(`LUMIEARN_USER_${current.toLowerCase()}`));
+      if(!u || !u.referredBy) return "LUMIEARN";
+      current = u.referredBy;
+    }
+    return current || "LUMIEARN";
+  }
+
+  const updates = [];
+  for(let level=1; level<=3; level++){
+    const rewardAmount = newCountry.mlmRewards[`l${level}`] || 0;
+
+    // Deduct from previous upline if exists
+    const previousUpline = getUpline(username, level);
+    if(previousUpline.toLowerCase() !== "lumiearn"){
+      let prevWallet = JSON.parse(localStorage.getItem(`wallet_${previousUpline}`)) || {};
+      prevWallet.referralBonus = (prevWallet.referralBonus || 0) - rewardAmount;
+      localStorage.setItem(`wallet_${previousUpline}`, JSON.stringify(prevWallet));
+      updates.push({level, deducted: previousUpline, deductedAmount: rewardAmount, awarded: "", awardedAmount: 0});
+    }
+
+    // Award to new upline
+    const targetUpline = getUpline(username, level);
+    let targetWallet = JSON.parse(localStorage.getItem(`wallet_${targetUpline}`)) || {};
+    targetWallet.referralBonus = (targetWallet.referralBonus || 0) + rewardAmount;
+    localStorage.setItem(`wallet_${targetUpline}`, JSON.stringify(targetWallet));
+    updates.push({level, deducted: previousUpline, deductedAmount: rewardAmount, awarded: targetUpline, awardedAmount: rewardAmount});
+  }
+
+  // --- Show MLM popup ---
+  const mlmTable = document.getElementById("mlmTable");
+  mlmTable.innerHTML = "";
+  updates.forEach(u=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${u.level}</td>
+                    <td>${u.deducted}</td>
+                    <td>${formatCurrency(u.deductedAmount, newCountry.currency)}</td>
+                    <td>${u.awarded}</td>
+                    <td>${formatCurrency(u.awardedAmount, newCountry.currency)}</td>`;
+    mlmTable.appendChild(tr);
+  });
+  if(updates.length) document.getElementById("mlmPopup").style.display = "block";
+
+  // --- Update dashboard ---
+  updateDashboard(username);
+
+  document.getElementById("result").innerText = "Profile updated successfully!";
+  document.getElementById("newPassword").value = "";
+  document.getElementById("confirmPassword").value = "";
+}
+
+// --- PASSWORD TOGGLE ---
+document.addEventListener("click", function(e){
+  if(e.target.classList.contains("toggle-password")){
+    const input = e.target.previousElementSibling;
+    input.type = input.type === "password" ? "text" : "password";
+  }
+});
+
+// --- INITIAL LOAD ---
+document.addEventListener("DOMContentLoaded", function(){
+  const username = getUsernameFromURL();
+  if(username){
+    loadUserData(username);
+  } else {
+    document.getElementById("result").innerText = "No user specified in URL. Use ?user=USERNAME";
+  }
+});
+</script>
+</body>
+</html>

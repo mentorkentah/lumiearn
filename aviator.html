@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Aviator</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+
+/* DARK MODE */
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* SIDEBAR */
+.sidebar{
+  width:250px;
+  background:var(--sidebar);
+  position:fixed;
+  left:-250px;
+  top:0;
+  height:100%;
+  padding:20px;
+  transition:.3s;
+  z-index:1200;
+  overflow-y:auto;
+}
+.sidebar.active{left:0;}
+
+/* HEADER */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--card);
+  padding:12px 16px;
+  border-radius:14px;
+  margin:20px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  border-left:4px solid var(--accent);
+  z-index:900;
+}
+
+/* HAMBURGER */
+.menu-toggle{
+  width:38px;height:38px;
+  border-radius:8px;
+  background:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  position:relative;
+}
+.menu-toggle span{
+  width:18px;height:2px;
+  background:#000;
+  position:absolute;
+  transition:.3s;
+}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+
+/* BRAND */
+.brand {display:flex;align-items:center;padding-left:120px;}
+.brand-name {font-size:25px;font-weight:bold;color:#1e1e1e;}
+
+/* MODE BUTTON */
+.mode-btn{background:var(--card);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* MAIN CONTENT */
+.main{padding:20px;margin-left:0; flex:1;}
+
+/* AVIATOR */
+.aviator{
+  background:#0b0f14;
+  color:#e5e7eb;
+  border-radius:18px;
+  padding:14px;
+  max-width:600px;
+  margin:0 auto;
+}
+.av-header{display:flex;justify-content:space-between;align-items:center;}
+.av-balance{color:#19c37d;font-weight:700;}
+.deposit-btn{
+  padding:6px 10px;
+  border:none;
+  border-radius:8px;
+  background:#19c37d;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* ROUND BAR */
+.round-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#020617;
+  padding:8px 12px;
+  border-radius:12px;
+  margin-top:10px;
+}
+.rounds span{margin-right:8px;font-weight:700}
+.low{color:#60a5fa}
+.mid{color:#a78bfa}
+.high{color:#f472b6}
+.menu-btn{background:none;border:none;color:#9ca3af;font-size:22px;cursor:pointer;}
+.dropdown{position:absolute;right:10px;top:40px;background:#020617;border-radius:10px;padding:10px;display:none;}
+
+/* GAME CANVAS */
+.canvas{
+  position:relative;
+  height:240px;
+  margin-top:10px;
+  background:radial-gradient(circle at bottom,#1f2937,#020617);
+  border-radius:14px;
+  overflow:hidden;
+}
+#multiplier{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:800;}
+#plane{position:absolute;bottom:20px;left:20px;font-size:30px;}
+
+/* BETS */
+.bets{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.bet-box{background:#151b22;border-radius:14px;padding:10px;}
+.bet-box input{width:100%;padding:10px;border-radius:10px;border:none;background:#020617;color:white;}
+.btn{margin-top:10px;width:100%;padding:12px;border:none;border-radius:12px;font-weight:700;cursor:pointer;}
+.bet{background:#19c37d;color:#022c22;}
+.cashout{background:#facc15;color:#422006;}
+.profit{text-align:center;margin-top:6px;color:#22c55e;font-weight:700;}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:1300;}
+.modal-box{background:#020617;padding:20px;border-radius:14px;width:90%;max-width:320px;}
+.modal-box input{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;}
+.modal-box button{width:100%;padding:12px;border:none;border-radius:10px;background:#19c37d;font-weight:700;cursor:pointer;}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:15px;
+  font-size:14px;
+  background:var(--card);
+  color:var(--text);
+  margin-top:auto;
+}
+footer a{color:var(--accent);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h3>LUMIEARN MENU</h3>
+  <!-- Add your menu items here -->
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div style="display:flex; align-items:center;">
+    <div class="menu-toggle" id="menuToggle">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="brand"><span class="brand-name">LUMIEARN</span></div>
+  </div>
+
+  <div style="display:flex; align-items:center; gap:8px;">
+    <img id="countryFlag" src="" alt="Country" style="width:28px;height:20px;border-radius:4px;">
+    <button class="mode-btn" id="modeBtn"><i class="fa-solid fa-moon"></i></button>
+    <img id="dashboardAvatar" src="https://i.pravatar.cc/150?u=user"
+         style="width:38px;height:38px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid var(--accent);">
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="aviator">
+    <div class="av-header">
+      <strong>Aviator</strong>
+      <div>
+        <span class="av-balance" id="balance">0.00 KES</span>
+        <button class="deposit-btn" onclick="openDeposit()">Deposit</button>
+      </div>
+    </div>
+
+    <div class="round-bar">
+      <div class="rounds" id="rounds"></div>
+      <button class="menu-btn" onclick="toggleRounds()">⋮</button>
+      <div class="dropdown" id="dropdown"></div>
+    </div>
+
+    <div class="canvas">
+      <div id="multiplier">1.00x</div>
+      <div id="plane">✈️</div>
+    </div>
+
+    <div class="bets">
+      <div class="bet-box">
+        <input type="number" id="amt1" value="10">
+        <button class="btn bet" id="btn1" onclick="placeBet(1)">BET</button>
+        <div class="profit" id="profit1"></div>
+      </div>
+      <div class="bet-box">
+        <input type="number" id="amt2" value="10">
+        <button class="btn bet" id="btn2" onclick="placeBet(2)">BET</button>
+        <div class="profit" id="profit2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEPOSIT MODAL -->
+<div class="modal" id="depositModal">
+  <div class="modal-box">
+    <h3>Deposit</h3>
+    <input type="number" id="depositInput">
+    <button onclick="deposit()">Confirm</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Copyright © 2026 
+  <strong><a href="#">LUMIEARN</a></strong>. 
+  Designed with ❤️ by 
+  <strong><a href="#">BestChoice Management</a></strong>. 
+  All rights reserved.
+</footer>
+
+<script>
+// Sidebar toggle
+const menuToggle=document.getElementById("menuToggle");
+const sidebar=document.getElementById("sidebar");
+menuToggle.onclick=()=>{sidebar.classList.toggle("active");menuToggle.classList.toggle("active");};
+document.addEventListener("click",e=>{
+  if(!sidebar.contains(e.target)&&!menuToggle.contains(e.target)){
+    sidebar.classList.remove("active");menuToggle.classList.remove("active");
+  }
+});
+
+// Dark mode
+const modeBtn=document.getElementById("modeBtn");
+modeBtn.onclick=()=>document.body.classList.toggle("dark");
+
+// Country flag fallback
+const flagImg=document.getElementById('countryFlag');
+flagImg.src='https://flagcdn.com/w20/ke.png';
+
+// Aviator logic
+let balance=0,multiplier=1,crashAt=0,running=false,loop=null,bets={1:{amount:0,active:false},2:{amount:0,active:false}};
+const balEl=document.getElementById("balance"),plane=document.getElementById("plane"),multEl=document.getElementById("multiplier"),roundsEl=document.getElementById("rounds"),dropEl=document.getElementById("dropdown"),depositModal=document.getElementById("depositModal"),depositInput=document.getElementById("depositInput");
+function formatCurrency(amount){return 'KSH '+amount.toFixed(2);}
+function updateBalance(){balEl.textContent=formatCurrency(balance);}
+function openDeposit(){depositModal.style.display="flex";}
+function deposit(){const v=+depositInput.value;if(v>0){balance+=v;updateBalance();}depositModal.style.display="none";}
+function placeBet(i){const amt=+document.getElementById("amt"+i).value;if(amt<=0||balance<amt||bets[i].active) return;balance-=amt;bets[i]={amount:amt,active:true};updateBalance();const btn=document.getElementById("btn"+i);btn.textContent="CASH OUT";btn.className="btn cashout";btn.onclick=()=>cashOut(i);}
+function cashOut(i){if(!bets[i].active||!running) return;balance+=bets[i].amount*multiplier;resetBet(i);updateBalance();}
+function resetBet(i){bets[i].active=false;const btn=document.getElementById("btn"+i);btn.textContent="BET";btn.className="btn bet";btn.onclick=()=>placeBet(i);document.getElementById("profit"+i).textContent="";}
+function updateHistory(){roundsEl.innerHTML="";[1,2,3,4,5].forEach(v=>{const s=document.createElement("span");s.textContent=v+"x";s.className=v<2?"low":v<4?"mid":"high";roundsEl.appendChild(s);});}
+function toggleRounds(){dropEl.style.display=dropEl.style.display==="block"?"none":"block";}
+function start(){if(running) return;running=true;multiplier=1;crashAt=Math.random()*10+1;plane.style.transform="translate(0,0)";loop=setInterval(()=>{multiplier+=0.02*multiplier;multEl.textContent=multiplier.toFixed(2)+"x";[1,2].forEach(i=>{if(bets[i].active)document.getElementById("profit"+i).textContent=formatCurrency(bets[i].amount*multiplier);});if(multiplier>=crashAt) crash();},50);}
+function crash(){clearInterval(loop);loop=null;running=false;multEl.textContent="CRASH";updateHistory();[1,2].forEach(i=>resetBet(i));setTimeout(()=>{if(!running)start();},2000);}
+updateBalance();start();
+</script>
+</body>
+</html>

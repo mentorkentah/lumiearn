@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Users - MLM Level 3</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+}
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  background: var(--sidebar);
+  position: fixed;
+  left: -250px;
+  top: 0;
+  height: 100%;
+  padding: 20px;
+  transition: .3s;
+  z-index: 1000;
+  overflow-y:auto;
+}
+.sidebar.active{left:0;}
+.sidebar h2{text-align:center;margin-bottom:25px;color:var(--accent);}
+.menu-item {display:flex;align-items:center;justify-content:space-between;padding:12px;cursor:pointer;border-radius:0 28px 28px 0;}
+.menu-item:hover {background: rgba(0,0,0,.05);}
+.menu-left {display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);}
+.submenu{display:none;flex-direction:column;padding-left:28px;}
+.submenu a{text-decoration:none;color:var(--accent);padding:10px 0;font-size:14px;}
+.menu-item a.active,.menu-item.open>.menu-left{background: rgba(0,207,200,0.15); color: var(--text); width:100%; margin-left:-12px; margin-right:-12px; padding:12px 20px; min-height:40px; display:flex;align-items:center;gap:10px; border-left:10px solid var(--accent); border-radius:0 20px 20px 0;}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:12px 16px;border-radius:14px;margin-bottom:25px;box-shadow:0 6px 18px rgba(0,0,0,.08);border-left:4px solid var(--accent);}
+.menu-toggle{width:38px;height:38px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.menu-toggle span{width:18px;height:2px;background:#000;position:absolute;transition:.3s;}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+.mode-btn{background:var(--card);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* BRAND */
+.brand {display:flex;align-items:center;font-family:Arial,sans-serif;height:40px;padding-left:46px;}
+.brand-name{font-size:25px;font-weight:bold;color:#1e1e1e;line-height:1;}
+
+/* MAIN CONTENT */
+.main{padding:20px;margin-left:0;transition:.3s;flex:1;display:flex;flex-direction:column;}
+.content-wrapper{width:100%;max-width:1200px;flex:1;display:flex;flex-direction:column;}
+
+/* CARD */
+.card {background:#fff;border-radius:18px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:25px;margin-bottom:30px;display:flex;flex-direction:column;}
+.card-header {background: linear-gradient(135deg, #00cfc8, #0077ff); color:#fff; padding:15px 20px; font-size:18px; font-weight:bold; border-radius:12px 12px 0 0;}
+.card-body {padding:20px;display:flex;flex-direction:column;flex:1;}
+
+/* EARNINGS & SEARCH */
+.earnings {color:#4a6cf7;font-weight:bold;margin-bottom:6px;text-align:left;}
+.search-box {display:flex;justify-content:flex-end;margin-bottom:15px;}
+.search-box input {width:220px;padding:6px 10px;border:1px solid #cfcfe6;border-radius:4px;font-size:13px;}
+
+/* TABLE */
+.table-wrapper {max-height:400px;overflow-y:auto;border:1px solid #cfcfe6;border-radius:8px;}
+table {width:100%;border-collapse:collapse;}
+thead th {position:sticky;top:0;background:#eaeaff;z-index:2;padding:10px;font-size:14px;}
+th, td {border:1px solid #cfcfe6;padding:10px;font-size:14px;text-align:center;white-space:nowrap;}
+tbody tr:nth-child(even) {background:#fafafa;}
+.status {padding:4px 10px;border-radius:12px;font-size:12px;color:white;}
+.status.active {background:#2ecc71;}
+
+/* PAGINATION */
+.pagination {margin-top:15px;text-align:center;display:flex;justify-content:center;gap:10px;align-items:center;font-size:14px;}
+.pagination button {padding:6px 12px;border:none;background:var(--accent);color:#fff;border-radius:6px;cursor:pointer;}
+.pagination button:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* FOOTER */
+footer{background:#f1f1f1;text-align:center;padding:15px;font-size:14px;margin-top:auto;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <strong>MENU</strong>
+  <div class="menu-item">
+    <a href="dashboard.html" class="menu-left"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+  </div>
+  <div class="menu-item has-sub" id="downlinesBtn">
+    <div class="menu-left"><i class="fa-solid fa-users"></i><span>Downlines</span></div>
+    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+  </div>
+  <div class="submenu">
+    <div class="menu-left"><span>Level 3</span></div>
+    <a href="#" class="active">Active</a>
+    <a href="#">Inactive</a>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="content-wrapper">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+      <div class="brand"><span class="brand-name">LUMIEARN</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <img id="countryFlag" src="" style="width:28px;height:20px;border-radius:4px;">
+        <button class="mode-btn" id="modeBtn"><i class="fa-solid fa-moon"></i></button>
+        <img id="dashboardAvatar" src="https://i.pravatar.cc/150?u=user" style="width:38px;height:38px;border-radius:50%;border:2px solid var(--accent);">
+      </div>
+    </div>
+
+    <!-- LEVEL 3 CARD -->
+    <div class="card">
+      <div class="card-header">ACTIVE USERS – MLM LEVEL 3</div>
+      <div class="card-body">
+
+        <div class="earnings" id="totalEarnings">Total Level 3 Earnings: 0</div>
+        <div class="earnings" id="totalUsers">Total Users: 0</div>
+
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Search user or phone...">
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>USERNAME</th>
+                <th>MOBILE</th>
+                <th>LEVEL 3 EARNED</th>
+                <th>STATUS</th>
+                <th>BALANCE</th>
+                <th>COUNTRY</th>
+                <th>DATE JOINED</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination">
+          <button id="prevPage">Previous</button>
+          <span id="pageInfo">Page 1 of 1</span>
+          <button id="nextPage">Next</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Copyright © 2026 <strong>LUMIEARN</strong>. Designed with ❤️ by <strong>BestChoice Management</strong>. All rights reserved.
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+  const VIEW_LEVEL = 3;
+  const loggedKey = localStorage.getItem("LUMIEARN_LOGGED_IN")?.toLowerCase();
+  if(!loggedKey) location.href="login.html";
+
+  const tbody = document.getElementById("tbody");
+  const perPage = 10;
+  let currentPage = 1;
+  let usersData = [];
+
+  const currencyRates = {USD:1,KSH:160,UGX:3900,TSH:2500,GHS:10};
+  function convertCurrency(amount, from, to){if(!currencyRates[from]||!currencyRates[to]) return 0; return Math.floor((amount/currencyRates[from])*currencyRates[to]);}
+
+  const refKey = "LUMIEARN_USER_"+loggedKey;
+  const referrer = JSON.parse(localStorage.getItem(refKey)) || {};
+  const refCurrency = referrer.currency || "KSH";
+
+  function getAllUsers(){return Object.keys(localStorage).filter(k=>k.startsWith("LUMIEARN_USER_")).map(k=>JSON.parse(localStorage.getItem(k)));}
+  function getNthUpline(username, level){let current=username.toLowerCase(); for(let i=0;i<level;i++){const u=JSON.parse(localStorage.getItem("LUMIEARN_USER_"+current)); if(!u||!u.referredBy)return null; current=u.referredBy.toLowerCase();} return current;}
+
+  function renderTable(){
+    tbody.innerHTML="";
+    const start = (currentPage-1)*perPage;
+    const end = start + perPage;
+    const pageUsers = usersData.slice(start,end);
+
+    let totalConverted = 0;
+
+    pageUsers.forEach(user=>{
+      const earned = user.mlmRewards?.l3 || 0;
+      const userCurrency = user.currency || "USD";
+      totalConverted += convertCurrency(earned,userCurrency,refCurrency);
+
+      tbody.innerHTML += `<tr>
+        <td>${user.username}</td>
+        <td>${user.phone||'N/A'}</td>
+        <td>${userCurrency} ${earned.toLocaleString()}</td>
+        <td><span class="status active">Active</span></td>
+        <td>${userCurrency} 0</td>
+        <td>${user.country||'N/A'}</td>
+        <td>${new Date(user.registeredAt).toLocaleDateString()}</td>
+      </tr>`;
+    });
+
+    document.getElementById("totalUsers").textContent="Total Users: "+usersData.length;
+    document.getElementById("totalEarnings").textContent=`Total Level 3 Earnings: ${refCurrency} ${totalConverted.toLocaleString()}`;
+
+    const totalPages = Math.ceil(usersData.length/perPage);
+    document.getElementById("pageInfo").textContent=`Page ${currentPage} of ${totalPages}`;
+    document.getElementById("prevPage").disabled = currentPage===1;
+    document.getElementById("nextPage").disabled = currentPage===totalPages;
+  }
+
+  usersData = getAllUsers().filter(user=>getNthUpline(user.username,VIEW_LEVEL)===loggedKey);
+  renderTable();
+
+  document.getElementById("prevPage").onclick=()=>{if(currentPage>1){currentPage--;renderTable();}};
+  document.getElementById("nextPage").onclick=()=>{const totalPages=Math.ceil(usersData.length/perPage); if(currentPage<totalPages){currentPage++;renderTable();}};
+
+  document.getElementById("searchInput").addEventListener("input",(e)=>{
+    const query = e.target.value.toLowerCase();
+    usersData = getAllUsers().filter(user=>{
+      return getNthUpline(user.username,VIEW_LEVEL)===loggedKey &&
+             (user.username.toLowerCase().includes(query) || (user.phone||'').toLowerCase().includes(query));
+    });
+    currentPage=1;
+    renderTable();
+  });
+
+  // Hamburger menu
+  const menuToggle=document.getElementById("menuToggle");
+  const sidebar=document.getElementById("sidebar");
+  menuToggle.onclick=()=>{sidebar.classList.toggle("active");menuToggle.classList.toggle("active");};
+  document.addEventListener("click",e=>{
+    if(!sidebar.contains(e.target)&&!menuToggle.contains(e.target)){
+      sidebar.classList.remove("active");
+      menuToggle.classList.remove("active");
+    }
+  });
+  // Dark mode
+  const modeBtn=document.getElementById("modeBtn");
+  modeBtn.onclick=()=>{document.body.classList.toggle("dark");};
+
+  // Submenu toggle
+  document.querySelectorAll(".menu-item.has-sub").forEach(item=>{
+    const submenu=item.nextElementSibling;
+    const toggleIcon=item.querySelector(".toggle-icon");
+    if(!submenu) return;
+    item.addEventListener("click",e=>{
+      e.stopPropagation();
+      const isOpen=item.classList.toggle("open");
+      submenu.style.display=isOpen?"flex":"none";
+      if(toggleIcon) toggleIcon.style.transform=isOpen?"rotate(180deg)":"rotate(0deg)";
+    });
+  });
+
+  // Country Flag
+  const userData = JSON.parse(localStorage.getItem(refKey)) || {};
+  const countryFlags = {
+    'Kenya':'https://flagcdn.com/w20/ke.png',
+    'Uganda':'https://flagcdn.com/w20/ug.png',
+    'Tanzania':'https://flagcdn.com/w20/tz.png',
+    'United States':'https://flagcdn.com/w20/us.png',
+    'Ghana':'https://flagcdn.com/w20/gh.png'
+  };
+  const flagImg = document.getElementById('countryFlag');
+  if(flagImg && countryFlags[userData.country]) flagImg.src = countryFlags[userData.country];
+
+});
+</script>
+</body>
+</html>

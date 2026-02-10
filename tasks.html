@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Daily Tasks</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+</head>
+
+<body>
+
+<h2>Daily Tasks</h2>
+
+<div class="task" data-task="Youtube" data-amount="10">
+  <button>Complete YouTube Task</button>
+</div>
+
+<div class="task" data-task="Tiktok" data-amount="15">
+  <button>Complete TikTok Task</button>
+</div>
+
+<div class="task" data-task="Trivia" data-amount="5">
+  <button>Complete Trivia Quiz</button>
+</div>
+
+<script>
+/* --- COMPLETE TASK --- */
+function completeTask(task, amount){
+  const username = localStorage.getItem("LUMIEARN_LOGGED_IN");
+  if(!username) return alert("Not logged in");
+
+  /* 1️⃣ Update wallet */
+  const walletKey = `wallet_${username}`;
+  let wallet = JSON.parse(localStorage.getItem(walletKey)) || {};
+
+  wallet.balance = (wallet.balance || 0) + amount;
+  wallet.profit = (wallet.profit || 0) + amount;
+
+  localStorage.setItem(walletKey, JSON.stringify(wallet));
+
+  /* 2️⃣ Save completed task */
+  const completedKey = `completedTasks_${username}`;
+  const completed = JSON.parse(localStorage.getItem(completedKey)) || [];
+
+  completed.push({
+    task,
+    amount,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem(completedKey, JSON.stringify(completed));
+
+  alert(`${task} completed! +${amount}`);
+}
+
+/* --- BUTTON HANDLERS --- */
+document.querySelectorAll(".task button").forEach(btn=>{
+  btn.onclick = e => {
+    const box = e.target.closest(".task");
+    completeTask(box.dataset.task, Number(box.dataset.amount));
+    btn.disabled = true;
+    btn.textContent = "Completed ✔";
+  };
+});
+</script>
+
+</body>
+</html>

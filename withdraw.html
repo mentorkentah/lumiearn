@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request Withdrawal - LUMIEARN</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+body{
+  font-family:Arial,sans-serif;
+  background:#f5f7fa;
+  padding:20px;
+}
+
+/* CARD */
+.card{
+  background:#fff;
+  padding:22px;
+  border-radius:16px;
+  max-width:520px;
+  margin:auto;
+  box-shadow:0 6px 18px rgba(0,0,0,.1);
+}
+
+h2{
+  text-align:center;
+  color:#0077ff;
+  margin-bottom:18px;
+}
+
+label{
+  display:block;
+  margin:12px 0 6px;
+  font-weight:bold;
+}
+
+/* INPUTS */
+input,select{
+  width:100%;
+  max-width:420px;
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:14px;
+  margin:0 auto 14px;
+  display:block;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  max-width:420px;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:#0077ff;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+  margin:18px auto 0;
+  display:block;
+}
+button:hover{opacity:.9}
+
+/* WARNING / SUCCESS BOX */
+.warning{
+  display:none;
+  margin-top:16px;
+  padding:16px 18px 18px;
+  border-radius:14px;
+  border-left:6px solid;
+  position:relative;
+  max-width:420px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.warning.error{
+  background:#ffeaea;
+  color:#b30000;
+  border-color:#e74c3c;
+}
+
+.warning.success{
+  background:#eafff1;
+  color:#0a7a3d;
+  border-color:#2ecc71;
+}
+
+/* ICON BUTTON (DEFAULT = DOTTED) */
+.warning .icon-btn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  font-weight:bold;
+  background:#fff;
+  border:2px dotted;
+}
+
+/* SUCCESS ICON → SOLID GREEN */
+.warning.success .icon-btn{
+  color:#2ecc71;
+  border:2px solid #2ecc71;
+  cursor:default;
+}
+.warning.success .icon-btn:hover{
+  transform:scale(1.1);
+}
+
+/* ERROR ICON → DOTTED RED */
+.warning.error .icon-btn{
+  color:#e74c3c;
+  border-color:#e74c3c;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Request Withdrawal</h2>
+
+  <label>Select Wallet</label>
+  <select id="wallet">
+    <option value="" disabled selected>🔒 Select wallet</option>
+    <option>Mpesa</option>
+    <option>Airtel Money</option>
+    <option>Bank</option>
+  </select>
+
+  <label>Withdrawal Amount</label>
+  <input type="number" id="amount" placeholder="Enter amount">
+
+  <div class="warning error" id="warningBox">
+    <div class="icon-btn" id="iconBtn">×</div>
+    <div id="warningContent"></div>
+  </div>
+
+  <button onclick="requestWithdrawal()">Request Withdrawal</button>
+</div>
+
+<script>
+/* ================= ADMIN CONFIG ================= */
+const withdrawalConfig = {
+  Kenya:{
+    currency:"KSH",
+    ranges:[
+      {min:50,max:999,fee:5},
+      {min:1000,max:1999,fee:50},
+      {min:2000,max:4999,fee:80},
+      {min:5000,max:Infinity,fee:120}
+    ]
+  },
+  Uganda:{
+    currency:"UGX",
+    ranges:[
+      {min:5000,max:49999,fee:2000},
+      {min:50000,max:199999,fee:5000},
+      {min:200000,max:Infinity,fee:10000}
+    ]
+  },
+  Tanzania:{
+    currency:"TSH",
+    ranges:[
+      {min:3000,max:49999,fee:1500},
+      {min:50000,max:199999,fee:4000},
+      {min:200000,max:Infinity,fee:8000}
+    ]
+  }
+};
+/* =============================================== */
+
+const username = localStorage.getItem("LUMIEARN_LOGGED_IN");
+if(!username) location.href="login.html";
+
+const userData = JSON.parse(
+  localStorage.getItem("LUMIEARN_USER_"+username.toLowerCase())
+) || {};
+
+const country = userData.country || "Kenya";
+const config = withdrawalConfig[country];
+const currency = config.currency;
+
+let wallet = JSON.parse(localStorage.getItem(`wallet_${username}`)) || {balance:0};
+
+const box = document.getElementById("warningBox");
+const content = document.getElementById("warningContent");
+const icon = document.getElementById("iconBtn");
+
+icon.onclick = ()=> box.style.display="none";
+
+function getRange(amount){
+  return config.ranges.find(r=>amount>=r.min && amount<=r.max);
+}
+
+function showError(html){
+  box.className="warning error";
+  icon.innerHTML="×";
+  icon.onclick=()=>box.style.display="none";
+  content.innerHTML=html;
+  box.style.display="block";
+}
+
+function showSuccess(html){
+  box.className="warning success";
+  icon.innerHTML="✔";
+  icon.onclick=null;
+  content.innerHTML=html;
+  box.style.display="block";
+  setTimeout(()=>window.history.back(),5000);
+}
+
+function requestWithdrawal(){
+  const amount = Number(document.getElementById("amount").value);
+  const walletType = document.getElementById("wallet").value;
+
+  const minRange = config.ranges[0];
+  const minTotal = minRange.min + minRange.fee;
+
+  if(wallet.balance < minTotal){
+    return showError(`
+      <strong>Insufficient Balance</strong><br><br>
+      Minimum Withdrawal: ${currency} ${minRange.min.toLocaleString()}<br>
+      Fee: ${currency} ${minRange.fee.toLocaleString()}<br>
+      <strong>Total Required: ${currency} ${minTotal.toLocaleString()}</strong>
+    `);
+  }
+
+  if(!walletType)
+    return showError("⚠ Please select a payout wallet.");
+
+  if(!amount || amount<=0)
+    return showError("⚠ Enter a valid withdrawal amount.");
+
+  const range = getRange(amount);
+  if(!range)
+    return showError(`Minimum withdrawal is ${currency} ${minRange.min.toLocaleString()}`);
+
+  if(amount > wallet.balance)
+    return showError("⚠ Withdrawal amount exceeds wallet balance.");
+
+  let pending = JSON.parse(localStorage.getItem(`pending_${username}`)) || [];
+  pending.push({
+    amount,
+    fee:range.fee,
+    final:amount-range.fee,
+    wallet:walletType,
+    country,
+    status:"pending",
+    timestamp:new Date().toISOString()
+  });
+  localStorage.setItem(`pending_${username}`,JSON.stringify(pending));
+
+  wallet.balance -= amount;
+  localStorage.setItem(`wallet_${username}`,JSON.stringify(wallet));
+
+  showSuccess(`
+    <strong>Successfully Withdrawn</strong><br><br>
+    You have successfully requested <strong>${currency} ${amount.toLocaleString()}</strong>.<br>
+    The amount will be processed to your <strong>${walletType}</strong> wallet shortly.<br>
+    Please wait for admin approval.
+  `);
+}
+</script>
+
+</body>
+</html>

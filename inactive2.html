@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inactive Users</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f2f0fb; padding: 20px; }
+.card { max-width: 1100px; margin: auto; background: #fff; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+.card-header { background: linear-gradient(135deg, #e84393, #6c5ce7); color: #fff; padding: 15px 20px; font-size: 18px; font-weight: bold; }
+.card-body { padding: 15px 20px; }
+.earnings { color: #4a6cf7; font-weight: bold; margin-bottom: 5px; }
+.search-box { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.search-box input { width: 220px; padding: 6px 10px; border: 1px solid #cfcfe6; border-radius: 4px; font-size: 13px; }
+.table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #cfcfe6; }
+table { width: 100%; border-collapse: collapse; }
+thead th { position: sticky; top: 0; background: #eaeaff; z-index: 2; }
+th, td { border: 1px solid #cfcfe6; padding: 10px; font-size: 14px; white-space: nowrap; }
+tbody tr:nth-child(even) { background: #fafafa; }
+tbody tr:hover { background: #eef2ff; }
+.status { padding: 4px 10px; border-radius: 12px; font-size: 12px; color: white; background: #e74c3c; } /* RED INACTIVE */
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header" id="title">LEVEL 2 INACTIVE USERS</div>
+  <div class="card-body">
+    <div class="earnings" id="totalEarnings">Total Earnings: 0</div>
+    <div class="earnings" id="totalUsers">Total Users: 0</div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search user...">
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>USERNAME</th>
+            <th>MOBILE</th>
+            <th>EARNED</th>
+            <th>STATUS</th>
+            <th>BALANCE</th>
+            <th>COUNTRY</th>
+            <th>DATE JOINED</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- CONFIG ---
+const VIEW_LEVEL = 2; // Change to 2 or 3 for other levels
+const loggedIn = localStorage.getItem("LUMIEARN_LOGGED_IN");
+const loggedKey = loggedIn?.toLowerCase();
+const tbody = document.getElementById("tbody");
+
+// --- GET ALL USERS ---
+function getAllUsers(){
+  return Object.keys(localStorage)
+    .filter(k=>k.startsWith("LUMIEARN_USER_"))
+    .map(k=>JSON.parse(localStorage.getItem(k)));
+}
+
+// --- NTH UPLINE ---
+function getNthUpline(username, level){
+  let current = username.toLowerCase();
+  for(let i=0;i<level;i++){
+    const key = "LUMIEARN_USER_" + current;
+    const data = JSON.parse(localStorage.getItem(key));
+    if(!data || !data.referredBy) return null;
+    if(data.referredBy.toLowerCase() === "lumiearn") return null;
+    current = data.referredBy.toLowerCase();
+  }
+  return current;
+}
+
+// --- INACTIVE CHECK ---
+function isInactive(user){
+  return !user.lastActive || user.lastActive < Date.now() - 30*86400000; // 30 days
+}
+
+// --- RENDER USERS ---
+let count=0;
+getAllUsers().forEach(user=>{
+  const upline = getNthUpline(user.username, VIEW_LEVEL);
+  if(!upline || upline !== loggedKey) return;
+  if(!isInactive(user)) return;
+
+  count++;
+  const dateJoined = user.createdAt ? new Date(Number(user.createdAt)).toLocaleDateString('en-GB') : "N/A";
+
+  // --- BALANCE LOGIC ---
+  let balance = 0;
+  if(user.country === "Kenya"){
+    balance = (VIEW_LEVEL === 1) ? 300 : 500; // constant for Kenya
+  } else {
+    balance = user.capital || user.capitalFee || 0;
+  }
+
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${user.username}</td>
+    <td>${user.phone || 'N/A'}</td>
+    <td>${user.currency || 'USD'} 0</td>
+    <td><span class="status">Inactive</span></td>
+    <td>${user.currency || 'USD'} ${balance}</td>
+    <td>${user.country || 'N/A'}</td>
+    <td>${dateJoined}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+document.getElementById("totalUsers").textContent = "Total Users: " + count;
+
+// --- SEARCH ---
+document.getElementById("searchInput").addEventListener("keyup", function(){
+  const q = this.value.toLowerCase();
+  Array.from(tbody.children).forEach(row=>{
+    row.style.display = row.innerText.toLowerCase().includes(q) ? "" : "none";
+  });
+});
+</script>
+</body>
+</html>

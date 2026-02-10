@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Trivia Quiz</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+  --selected:#28a745;
+}
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* SIDEBAR */
+.sidebar {width:250px;background: var(--sidebar);position: fixed;left: -250px;top:0;height:100%;padding:20px;transition:.3s;z-index:1000;overflow-y:auto;}
+.sidebar.active{left:0;}
+.sidebar h2{text-align:center;margin-bottom:25px;color:var(--accent);}
+.menu-item {display:flex;align-items:center;justify-content:space-between;padding:12px;cursor:pointer;border-radius:0 28px 28px 0;}
+.menu-item:hover {background: rgba(0,0,0,.05);}
+.menu-left {display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);}
+.menu-item a.active,.menu-item.open>.menu-left{background: rgba(0,207,200,0.15); color: var(--text); width:100%; margin-left:-12px; margin-right:-12px; padding:12px 20px; min-height:40px; display:flex;align-items:center;gap:10px; border-left:10px solid var(--accent); border-radius:0 20px 20px 0;}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:12px 16px;border-radius:14px;margin-bottom:25px;box-shadow:0 6px 18px rgba(0,0,0,.08);border-left:4px solid var(--accent);}
+.menu-toggle{width:38px;height:38px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.menu-toggle span{width:18px;height:2px;background:#000;position:absolute;transition:.3s;}
+body.dark .menu-toggle span{background:#fff;}
+.menu-toggle span:nth-child(1){top:12px;}
+.menu-toggle span:nth-child(2){top:18px;}
+.menu-toggle span:nth-child(3){top:24px;}
+.menu-toggle.active span:nth-child(1){top:18px;transform:rotate(45deg);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){top:18px;transform:rotate(-45deg);}
+.mode-btn{background:var(--card);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* BRAND */
+.brand {display:flex;align-items:center;font-family:Arial,sans-serif;height:40px;padding-left:46px;}
+.brand-name{font-size:25px;font-weight:bold;color:#1e1e1e;line-height:1;}
+
+/* MAIN CONTENT */
+.main{padding:20px;margin-left:0;transition:.3s;flex:1;display:flex;flex-direction:column;}
+
+/* QUIZ */
+.quiz-container{display:flex;flex-direction:column;gap:20px;}
+.question{font-weight:bold;font-size:16px;}
+.options{display:flex;flex-direction:column;gap:8px;margin-left:20px;}
+.option{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.option-circle{width:24px;height:24px;border:2px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;color:var(--accent);transition:.2s;}
+.option-circle.selected{background:var(--selected);color:#fff;border-color:var(--selected);}
+.submit-btn{padding:12px 20px;background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:bold;align-self:center;margin-top:20px;}
+.timer{font-weight:bold;color:var(--accent);margin-bottom:15px;}
+
+/* WIN NOTIFICATION */
+.win-notification{position:fixed;top:20px;right:20px;background:var(--accent);color:#fff;padding:12px 18px;border-radius:10px;opacity:0;transition:.3s;z-index:9999;max-width:280px;}
+.win-notification.show{opacity:1;}
+
+/* FOOTER */
+footer{text-align:center;padding:15px;font-size:14px;background:#f1f1f1;margin-top:auto;}
+footer a{text-decoration:none;color:inherit;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h2>LUMIEARN MENU</h2>
+  <div class="menu-item"><a href="dashboard.html" class="menu-left"><i class="fa-solid fa-house"></i><span>Dashboard</span></a></div>
+  <div class="menu-item"><a href="trivia.html" class="menu-left"><i class="fa-solid fa-question"></i><span>Trivia Quiz</span></a></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="header">
+    <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></div>
+    <div class="brand"><span class="brand-name">LUMIEARN</span></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <img id="countryFlag" src="https://flagcdn.com/w20/ke.png" style="width:28px;height:20px;border-radius:4px;">
+      <button class="mode-btn" id="modeBtn"><i class="fa-solid fa-moon"></i></button>
+      <img id="dashboardAvatar" src="https://i.pravatar.cc/150?u=user" style="width:38px;height:38px;border-radius:50%;border:2px solid var(--accent);">
+    </div>
+  </div>
+
+  <h2>Trivia Quiz - Earn Ksh 50 per Correct Answer</h2>
+  <div class="timer" id="globalTimer"></div>
+  <div class="quiz-container" id="quizContainer"></div>
+</div>
+
+<div class="win-notification" id="winNotification"><span id="winMessage"></span></div>
+
+<footer>
+  Copyright © 2026 <strong>LUMIEARN</strong>. Designed with ❤️ by <strong>BestChoice Management</strong>.
+</footer>
+
+<script>
+// SIDEBAR
+const menuToggle=document.getElementById("menuToggle");
+const sidebar=document.getElementById("sidebar");
+menuToggle.onclick=()=>{sidebar.classList.toggle("active");menuToggle.classList.toggle("active");};
+document.addEventListener("click",e=>{if(!sidebar.contains(e.target)&&!menuToggle.contains(e.target)){sidebar.classList.remove("active");menuToggle.classList.remove("active");}});
+
+// DARK MODE
+document.getElementById("modeBtn").onclick=()=>{document.body.classList.toggle("dark");};
+
+// WALLET
+const username=localStorage.getItem("LUMIEARN_LOGGED_IN") || "User";
+let wallet=JSON.parse(localStorage.getItem(`wallet_${username}`))||{profit:0};
+
+// CHECK IF SUNDAY
+const today=new Date();
+const isSunday=today.getDay()===7; // Sunday = 7
+const quizContainer=document.getElementById("quizContainer");
+const timerEl=document.getElementById("globalTimer");
+if(!isSunday){
+  timerEl.textContent="Trivia quiz is available only on Sundays. Come back Sunday to earn!";
+} else {
+
+// QUESTIONS
+const questions=[
+  {q:"Capital of Kenya?", a:"Nairobi", options:["Mombasa","Kisumu","Nairobi","Nakuru"]},
+  {q:"2 + 2 equals?", a:"4", options:["3","4","5","6"]},
+  {q:"Color of the sky?", a:"Blue", options:["Red","Green","Blue","Yellow"]},
+  {q:"Days in a week?", a:"7", options:["5","6","7","8"]},
+  {q:"Cows give?", a:"Milk", options:["Eggs","Milk","Honey","Water"]},
+  {q:"Planet nearest Sun?", a:"Mercury", options:["Earth","Venus","Mercury","Mars"]}
+];
+
+const letters=["A","B","C","D"];
+const todayKey=`trivia_submitted_${username}_${today.toLocaleDateString()}`;
+let quizSubmitted=localStorage.getItem(todayKey)==="true";
+const userAnswers=Array(questions.length).fill(null);
+
+// BUILD QUIZ
+questions.forEach((q,i)=>{
+  const qDiv=document.createElement("div");
+  qDiv.className="question-block";
+  qDiv.innerHTML=`<div class="question">${i+1}. ${q.q}</div>
+    <div class="options">
+      ${q.options.map((opt,j)=>`<div class="option"><div class="option-circle">${letters[j]}</div>${opt}</div>`).join("")}
+    </div>`;
+  quizContainer.appendChild(qDiv);
+
+  const optionEls=qDiv.querySelectorAll(".option");
+  optionEls.forEach((el,j)=>{
+    el.onclick=()=>{
+      if(quizSubmitted) return;
+      qDiv.querySelectorAll(".option-circle").forEach(c=>c.classList.remove("selected"));
+      el.querySelector(".option-circle").classList.add("selected");
+      userAnswers[i]=q.options[j];
+    };
+  });
+});
+
+// SUBMIT BUTTON
+const submitBtn=document.createElement("button");
+submitBtn.className="submit-btn";
+submitBtn.textContent="Submit All Answers";
+quizContainer.appendChild(submitBtn);
+
+// UPDATE PROFIT
+function updateProfit(amountKSH){
+  wallet.profit=(wallet.profit||0)+amountKSH;
+  localStorage.setItem(`wallet_${username}`,JSON.stringify(wallet));
+  showNotification(`Ksh ${amountKSH} credited! Total Profit: ${wallet.profit}`);
+}
+
+// SUBMIT QUIZ LOGIC
+function submitQuiz(){
+  if(quizSubmitted){showNotification("You already submitted today's trivia."); return;}
+  quizSubmitted=true;
+  localStorage.setItem(todayKey,"true");
+
+  let correctCount=0,totalEarned=0;
+  questions.forEach((q,i)=>{
+    if(userAnswers[i]===q.a){correctCount++; totalEarned+=50;}
+  });
+  if(totalEarned>0) updateProfit(totalEarned);
+  showNotification(`Quiz Submitted! ${correctCount}/${questions.length} correct, Ksh ${totalEarned} earned.`);
+}
+submitBtn.onclick=submitQuiz;
+
+// TIMER
+let globalTime=15;
+timerEl.textContent=`Time Left: ${globalTime}s`;
+const interval=setInterval(()=>{
+  globalTime--;
+  timerEl.textContent=`Time Left: ${globalTime}s`;
+  if(globalTime<=0){clearInterval(interval);submitQuiz();}
+},1000);
+}
+
+// NOTIFICATION
+function showNotification(msg){
+  const win=document.getElementById("winNotification");
+  document.getElementById("winMessage").textContent=msg;
+  win.classList.add("show");
+  setTimeout(()=>win.classList.remove("show"),3000);
+}
+</script>
+</body>
+</html>

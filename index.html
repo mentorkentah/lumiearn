@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LUMIEARN</title>
+</head>
+<body>
+
+<script>
+  const user = localStorage.getItem("lumiearnUser");
+
+  if (user) {
+    window.location.replace("dashboard.html");
+  } else {
+    window.location.replace("register.html");
+  }
+</script>
+
+</body>
+</html>

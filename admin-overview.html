@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMIEARN Admin Dashboard</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --sidebar:#ffffff;
+  --text:#111;
+  --accent:#00cfc8;
+  --accent-dark:#0077ff;
+}
+body.dark{
+  --bg:#0a0a0f;
+  --card:#111118;
+  --sidebar:#111118;
+  --text:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:250px;
+  background:var(--sidebar);
+  position:fixed;
+  left:-250px;
+  top:0;
+  height:100vh;
+  padding:20px;
+  transition:left 0.3s ease;
+  z-index:1000;
+  box-shadow:2px 0 12px rgba(0,0,0,.15);
+}
+.sidebar.active{left:0;}
+.menu-item{
+  border-radius:8px;
+}
+
+.menu-item a{
+  padding:12px;
+  border-radius:8px;
+  color:var(--text);
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:500;
+  width:100%;
+}
+
+/* Proper hover + click effect */
+.menu-item a:hover{
+  background:var(--accent);
+  color:#fff;
+}
+
+.menu-item a i{
+  width:20px;
+  text-align:center;
+}
+
+/* MAIN */
+.main{padding:20px;flex:1;margin-left:0}
+@media(min-width: 768px){.main{margin-left:250px;}}
+
+/* HEADER */
+.header{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--card);
+  padding:12px 20px;
+  border-radius:11px;
+  box-shadow:0 6px 18px rgba(0,0,0,.1);
+  margin-bottom:25px;
+}
+.brand{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:22px;
+  font-weight:700;
+  color:var(--accent);
+}
+.header-right{display:flex;align-items:center;gap:10px}
+
+/* MENU TOGGLE */
+.menu-toggle{
+  width:40px;height:40px;
+  display:flex;flex-wrap:wrap;gap:4px;
+  cursor:pointer;
+}
+.menu-toggle span{
+  width:18px;height:18px;
+  background:var(--accent);
+}
+
+/* COUNTRY */
+.country-selector{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:8px;
+  background:var(--card);
+  cursor:pointer;
+}
+.country-dropdown{
+  position:absolute;
+  top:120%;right:0;
+  background:var(--card);
+  border-radius:10px;
+  display:none;
+  overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+.country-dropdown div{
+  padding:10px 14px;
+  cursor:pointer;
+}
+.country-dropdown div:hover{background:var(--accent);color:#fff}
+.country-selector.active .country-dropdown{display:block}
+
+/* AVATAR */
+#dashboardAvatar{
+  width:40px;height:40px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  object-fit:cover;
+}
+
+/* WELCOME */
+.welcome-card{
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+  color:#fff;
+  padding:25px;
+  border-radius:18px;
+  margin-bottom:30px;
+  display:flex;
+  gap:20px;
+  align-items:flex-start;
+}
+
+/* PENDING */
+.pending-box{
+  background:rgba(255,255,255,.18);
+  padding:14px 18px;
+  border-radius:12px;
+  margin-top:12px;
+  font-size:20px;
+  font-weight:700;
+}
+.pending-progress{margin-top:10px}
+.pending-progress .label{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:6px;
+}
+.pending-progress .bar{
+  height:10px;
+  background:rgba(255,255,255,.35);
+  border-radius:10px;
+  overflow:hidden;
+}
+.pending-progress .bar span{
+  display:block;
+  height:100%;
+  width:0;
+  background:linear-gradient(135deg,#8360c3,#2ebf91);
+  transition:width 1.5s ease;
+}
+
+/* STATS */
+.stats-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+}
+.stats-card{
+  padding:20px;
+  border-radius:14px;
+  color:#fff;
+  text-align:center;
+  transition:.3s;
+}
+.stats-card:hover{transform:translateY(-6px)}
+.stats-card i{font-size:30px;margin-bottom:10px}
+.counter{font-size:24px;font-weight:700}
+
+/* PROGRESS (ADMIN PROFIT CARD) */
+.progress{
+  width:100%;
+  height:8px;
+  background:rgba(255,255,255,.35);
+  border-radius:10px;
+  margin-top:10px;
+}
+.progress span{
+  display:block;
+  height:100%;
+  width:0;
+  background:#fff;
+}
+
+/* COLORS */
+.users{background:linear-gradient(135deg,#00c6ff,#0072ff)}
+.today{background:linear-gradient(135deg,#f7971e,#ffd200);color:#111}
+.active{background:linear-gradient(135deg,#11998e,#38ef7d)}
+.inactive{background:linear-gradient(135deg,#434343,#000)}
+.admin{background:linear-gradient(135deg,#ff416c,#ff4b2b)}
+.payable{background:linear-gradient(135deg,#8360c3,#2ebf91)}
+.earnings{background:linear-gradient(135deg,#56ab2f,#a8e063)}
+.bonus{background:linear-gradient(135deg,#ff512f,#dd2476)}
+.withdrawals{background:linear-gradient(135deg,#8e2de2,#4a00e0)}
+.withdrawn{background:linear-gradient(135deg,#a1c4fd,#c2e9fb)}
+.total-paid{background:linear-gradient(135deg,#fbc2eb,#a6c1ee)}
+.today-paid{background:linear-gradient(135deg,#fddb92,#d1fdff);color:#111}
+
+/* Optional overlay when sidebar open */
+body.sidebar-open::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  z-index: 900;
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <strong>MENU</strong>
+
+  <div class="menu-item">
+    <a class="menu-left" href="dashboard.html">
+      <i class="fa-solid fa-house"></i> Dashboard
+    </a>
+  </div>
+
+  <div class="menu-item">
+    <a class="menu-left" href="users.html">
+      <i class="fa-solid fa-users"></i> Users
+    </a>
+  </div>
+
+  <div class="menu-item">
+    <a class="menu-left" href="bonuses.html">
+      <i class="fa-solid fa-gift"></i> Bonuses
+    </a>
+  </div>
+
+  <div class="menu-item">
+    <a class="menu-left" href="withdrawals.html">
+      <i class="fa-solid fa-wallet"></i> Withdrawals
+    </a>
+  </div>
+
+  <div class="menu-item">
+    <a class="menu-left" href="reports.html">
+      <i class="fa-solid fa-chart-line"></i> Reports
+    </a>
+  </div>
+
+  <div class="menu-item">
+    <a class="menu-left" href="settings.html">
+      <i class="fa-solid fa-gear"></i> Settings
+    </a>
+  </div>
+</div>
+
+<div class="main">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="menu-toggle" id="menuToggle"><span></span><span></span><span></span><span></span></div>
+    <div class="brand">LUMIEARN</div>
+    <div class="header-right">
+      <div class="country-selector" id="countrySelector">
+        <span id="countryFlag">🇰🇪</span>
+        <span id="countryCurrency">KSH</span>
+        <i class="fa-solid fa-chevron-down"></i>
+        <div class="country-dropdown">
+          <div data-code="KES">🇰🇪 KSH</div>
+          <div data-code="UGX">🇺🇬 UGX</div>
+          <div data-code="XOF">🇹🇬 XOF</div>
+          <div data-code="XAF">🇨🇲 XAF</div>
+        </div>
+      </div>
+      <img id="dashboardAvatar" src="https://i.pravatar.cc/150?u=admin">
+    </div>
+  </div>
+
+  <!-- WELCOME CARD -->
+  <div class="welcome-card">
+    <i class="fa-solid fa-user-shield fa-3x"></i>
+    <div style="flex:1">
+      <h2>Welcome back, <span id="adminUsername">Admin</span> 👋</h2>
+      <p>Monitor platform performance.</p>
+
+      <div class="pending-box">
+         <i class="fa-solid fa-arrow-trend-down"></i>
+         <h3>Pending Withdrawals</h3>
+         <p class="counter money" id="pendingWithdrawals">0</p>
+         <small style="opacity:.85"><span class="counter" id="activeUsers">0</span> users</small>
+      </div>
+
+      <div class="pending-progress">
+        <div class="label">
+          <span>Pending vs Payable</span>
+          <span id="pendingPercent">0%</span>
+        </div>
+        <div class="bar">
+          <span id="pendingBar"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-container">
+    <div class="stats-card users"><i class="fa-solid fa-users"></i><h3>Total Users</h3><p class="counter" id="totalUsers">0</p></div>
+    <div class="stats-card today"><i class="fa-solid fa-user-plus"></i><h3>Joined Today</h3><p class="counter" id="joinedToday">0</p></div>
+    <div class="stats-card active"><i class="fa-solid fa-user-check"></i><h3>Active Users</h3><p class="counter" id="activeUsersCard">0</p></div>
+    <div class="stats-card inactive"><i class="fa-solid fa-user-slash"></i><h3>Inactive Users</h3><p class="counter" id="inactiveUsersCard">0</p></div>
+    <div class="stats-card admin"><i class="fa-solid fa-wallet"></i><h3>Admin Profit</h3><p class="counter money" id="adminProfit">0</p><div class="progress"><span id="adminProgress"></span></div></div>
+    <div class="stats-card payable"><i class="fa-solid fa-file-invoice-dollar"></i><h3>Payable</h3><p class="counter money" id="payableAmount">0</p></div>
+    <div class="stats-card earnings"><i class="fa-solid fa-chart-line"></i><h3>Earnings</h3><p class="counter money" id="totalEarnings">0</p></div>
+    <div class="stats-card bonus"><i class="fa-solid fa-gift"></i><h3>Bonus Claims</h3><p class="counter money" id="bonusClaims">0</p></div>
+    <div class="stats-card withdrawn"><i class="fa-solid fa-money-bill-transfer"></i><h3>Total Admin Withdrawn</h3><p class="counter money" id="totalWithdrawn">0</p></div>
+    <div class="stats-card total-paid"><i class="fa-solid fa-hand-holding-dollar"></i><h3>Total Paid Amount</h3><p class="counter money" id="totalPaid">0</p></div>
+    <div class="stats-card today-paid"><i class="fa-solid fa-calendar-day"></i><h3>Today's Paid</h3><p class="counter money" id="todayPaid">0</p></div>
+  </div>
+</div>
+
+<script>
+// --- Admin login ---
+const currentAdmin = localStorage.getItem("LUMIEARN_CURRENT_ADMIN");
+if(!currentAdmin){alert("Please log in as admin"); window.location.href="admin-log.html"; }
+document.getElementById("adminUsername").textContent=currentAdmin;
+
+// --- Currency setup ---
+const currencies = {
+  KES:{symbol:"KSH",rate:1,flag:"🇰🇪"},
+  UGX:{symbol:"UGX",rate:39,flag:"🇺🇬"},
+  XOF:{symbol:"XOF",rate:7.4,flag:"🇹🇬"},
+  XAF:{symbol:"XAF",rate:7.4,flag:"🇨🇲"}
+};
+let activeCurrency = localStorage.getItem("currency") || "KES";
+
+function updateCurrencyDisplay(code){
+    activeCurrency = code;
+    localStorage.setItem("currency", code);
+    document.getElementById("countryFlag").textContent = currencies[activeCurrency].flag;
+    document.getElementById("countryCurrency").textContent = currencies[activeCurrency].symbol;
+    renderDashboard();
+}
+
+// --- Country selector toggle ---
+const countrySelector = document.getElementById("countrySelector");
+countrySelector.onclick = ()=> countrySelector.classList.toggle("active");
+
+document.querySelectorAll(".country-dropdown div").forEach(d=>{
+    d.onclick = ()=>{
+        updateCurrencyDisplay(d.dataset.code);
+        countrySelector.classList.remove("active");
+    }
+});
+
+// --- Dashboard calculation ---
+function calculateDashboard(){
+  const todayStr=new Date().toISOString().split("T")[0];
+  let stats={totalUsers:0,joinedToday:0,activeUsers:0,inactiveUsers:0,adminProfit:0,payable:0,earnings:0,bonusClaims:0,pendingWithdrawals:0,totalWithdrawn:0,totalPaid:0,todayPaid:0};
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(!key.startsWith("LUMIEARN_USER_")) continue;
+    const user=JSON.parse(localStorage.getItem(key));
+    const wallet=JSON.parse(localStorage.getItem(`wallet_${user.username}`))||{};
+    stats.totalUsers++;
+    if(user.joinDate===todayStr) stats.joinedToday++;
+    if((wallet.balance||0)>0) stats.activeUsers++; else stats.inactiveUsers++;
+    if(user.level===4){stats.adminProfit+=(wallet.registrationFee||0);}
+    stats.adminProfit += (wallet.spinsLost||0)+(wallet.withdrawalFee||0);
+    stats.payable += wallet.pending||0;
+    stats.earnings += (wallet.profit||0)+(wallet.referralBonus||0)+(wallet.deposit||0);
+    stats.bonusClaims += (wallet.referralBonus||0)+(wallet.welcomeBonus||0);
+    stats.pendingWithdrawals += wallet.pending||0;
+    stats.totalWithdrawn += wallet.totalWithdrawn||0;
+    stats.totalPaid += wallet.totalWithdrawn||0;
+    if(wallet.lastWithdrawalDate===todayStr) stats.todayPaid += wallet.totalWithdrawn||0;
+  }
+  return stats;
+}
+
+// --- Animate counter ---
+function animateCounter(el,value,isMoney=false){
+  const rate = isMoney ? currencies[activeCurrency].rate : 1;
+  const target = Math.round(value * rate);
+  let current=0;
+  const increment=Math.ceil(target/120);
+  function step(){
+    current += increment;
+    if(current < target){
+      el.textContent = isMoney ? `${currencies[activeCurrency].symbol} ${current.toLocaleString()}` : current.toLocaleString();
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = isMoney ? `${currencies[activeCurrency].symbol} ${target.toLocaleString()}` : target.toLocaleString();
+    }
+  }
+  step();
+}
+
+// --- Render dashboard ---
+function renderDashboard(){
+  const stats = calculateDashboard();
+  animateCounter(document.getElementById("pendingWithdrawals"), stats.pendingWithdrawals, true);
+  animateCounter(document.getElementById("activeUsers"), stats.activeUsers);
+  animateCounter(document.getElementById("totalUsers"), stats.totalUsers);
+  animateCounter(document.getElementById("joinedToday"), stats.joinedToday);
+  animateCounter(document.getElementById("activeUsersCard"), stats.activeUsers);
+  animateCounter(document.getElementById("inactiveUsersCard"), stats.inactiveUsers);
+  animateCounter(document.getElementById("adminProfit"), stats.adminProfit, true);
+  animateCounter(document.getElementById("payableAmount"), stats.payable, true);
+  animateCounter(document.getElementById("totalEarnings"), stats.earnings, true);
+  animateCounter(document.getElementById("bonusClaims"), stats.bonusClaims, true);
+  animateCounter(document.getElementById("totalWithdrawn"), stats.totalWithdrawn, true);
+  animateCounter(document.getElementById("totalPaid"), stats.totalPaid, true);
+  animateCounter(document.getElementById("todayPaid"), stats.todayPaid, true);
+
+  // Pending bar
+  const pendingPercent = stats.payable ? Math.round((stats.pendingWithdrawals/stats.payable)*100) : 0;
+  document.getElementById("pendingPercent").textContent = pendingPercent+"%";
+  document.getElementById("pendingBar").style.width = pendingPercent+"%";
+}
+
+// --- Initial render ---
+updateCurrencyDisplay(activeCurrency);
+
+// --- Sidebar toggle ---
+const menuToggle = document.getElementById("menuToggle");
+const sidebar = document.getElementById("sidebar");
+const body = document.body;
+
+menuToggle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  sidebar.classList.toggle("active");
+  body.classList.toggle("sidebar-open");
+});
+
+document.addEventListener("click", (e) => {
+  if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+    sidebar.classList.remove("active");
+    body.classList.remove("sidebar-open");
+  }
+});
+
+sidebar.addEventListener("click", (e) => e.stopPropagation());
+
+// --- Ensure all users have full wallet data ---
+for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key.startsWith("LUMIEARN_USER_")) continue;
+
+    const user = JSON.parse(localStorage.getItem(key));
+    let wallet = JSON.parse(localStorage.getItem(`wallet_${user.username}`)) || {};
+
+    wallet.balance        = wallet.balance || Math.floor(Math.random() * 5000);
+    wallet.profit         = wallet.profit || Math.floor(Math.random() * 4000);
+    wallet.referralBonus  = wallet.referralBonus || Math.floor(Math.random() * 1000);
+    wallet.welcomeBonus   = wallet.welcomeBonus || Math.floor(Math.random() * 500);
+    wallet.deposit        = wallet.deposit || Math.floor(Math.random() * 3000);
+    wallet.pending        = wallet.pending || Math.floor(Math.random() * 1500);
+    wallet.totalWithdrawn = wallet.totalWithdrawn || Math.floor(Math.random() * 3000);
+    wallet.withdrawalFee  = wallet.withdrawalFee || Math.floor(Math.random() * 200);
+    wallet.spinsLost      = wallet.spinsLost || Math.floor(Math.random() * 2000);
+    wallet.registrationFee= wallet.registrationFee || (user.level === 4 ? Math.floor(Math.random() * 100) : 0);
+    wallet.lastWithdrawalDate = wallet.lastWithdrawalDate || new Date().toISOString().split("T")[0];
+
+    localStorage.setItem(`wallet_${user.username}`, JSON.stringify(wallet));
+}
+// --- Close sidebar when menu link clicked ---
+document.querySelectorAll(".menu-left").forEach(link=>{
+  link.addEventListener("click", ()=>{
+    sidebar.classList.remove("active");
+    body.classList.remove("sidebar-open");
+  });
+});
+</script>
+</body>
+</html>

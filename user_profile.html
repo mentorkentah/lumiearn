@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Profile | LUMIEARN</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+body{
+  font-family:'Orbitron',sans-serif;
+  background:#0a0a0f;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  min-height:100vh;
+}
+.profile-card{
+  background:#111118;
+  max-width:480px;
+  width:100%;
+  border-radius:16px;
+  padding:30px;
+  box-shadow:0 0 20px rgba(0,255,240,0.25);
+}
+.profile-card h1{text-align:center;color:#00fff0;margin-bottom:20px;}
+.form-group{margin-bottom:18px;}
+label{display:block;margin-bottom:6px;font-weight:600;color:#0ff;}
+input{width:100%;height:50px;padding:0 12px;border-radius:12px;border:1px solid rgba(0,255,240,.4);background:#111118;color:#fff;font-size:15px;box-sizing:border-box;}
+input:focus{outline:none;border-color:#0ff;box-shadow:0 0 12px rgba(0,255,240,.35);}
+input[readonly]{opacity:0.7;cursor:not-allowed;}
+.btn{width:100%;height:50px;border:none;border-radius:16px;background:#00fff0;color:#0a0a0f;font-weight:700;font-size:16px;cursor:pointer;transition:.3s;}
+.btn:hover{box-shadow:0 0 20px rgba(0,255,240,.6);}
+#alertBox{display:none;text-align:center;margin-bottom:12px;padding:10px;border-radius:12px;font-weight:500;font-size:14px;}
+</style>
+</head>
+
+<body>
+<div class="profile-card">
+  <h1>My Profile</h1>
+  <div id="alertBox"></div>
+
+  <div class="form-group">
+    <label>Username</label>
+    <input type="text" id="username" readonly>
+  </div>
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" id="email" readonly>
+  </div>
+  <div class="form-group">
+    <label>Phone</label>
+    <input type="text" id="phone" readonly>
+  </div>
+  <div class="form-group">
+    <label>Country</label>
+    <input type="text" id="country" readonly>
+  </div>
+  <div class="form-group">
+    <label>Upline</label>
+    <input type="text" id="referredBy" readonly>
+  </div>
+
+  <hr style="border:1px solid rgba(0,255,240,.2);margin:20px 0;">
+
+  <div class="form-group">
+    <label>New Password</label>
+    <input type="password" id="newPassword" placeholder="Enter new password">
+  </div>
+  <div class="form-group">
+    <label>Confirm Password</label>
+    <input type="password" id="confirmPassword" placeholder="Confirm new password">
+  </div>
+  <button class="btn" id="updatePasswordBtn">Update Password</button>
+</div>
+
+<script>
+const usernameInput = document.getElementById("username");
+const emailInput = document.getElementById("email");
+const phoneInput = document.getElementById("phone");
+const countryInput = document.getElementById("country");
+const referredByInput = document.getElementById("referredBy");
+const newPassword = document.getElementById("newPassword");
+const confirmPassword = document.getElementById("confirmPassword");
+const alertBox = document.getElementById("alertBox");
+
+// Get logged-in user
+const loggedIn = localStorage.getItem("LUMIEARN_LOGGED_IN");
+if(!loggedIn){
+  alert("No logged-in user found! Redirecting to login...");
+  setTimeout(()=> location.href="log.html",1000);
+} else {
+  const storageKey = "LUMIEARN_USER_" + loggedIn.toLowerCase();
+  const userData = JSON.parse(localStorage.getItem(storageKey));
+  if(userData){
+    usernameInput.value = userData.username;
+    emailInput.value = userData.email;
+    phoneInput.value = userData.phone;
+    countryInput.value = userData.country;
+
+    // Show actual referrer username
+    if(userData.referredBy){
+      const refStorageKey = "LUMIEARN_USER_" + userData.referredBy.toLowerCase();
+      const refData = JSON.parse(localStorage.getItem(refStorageKey));
+      referredByInput.value = refData ? refData.username : "";
+    } else {
+      referredByInput.value = "";
+    }
+  }
+}
+
+// Show alerts
+function showAlert(msg,type){
+  alertBox.style.display = "block";
+  alertBox.innerText = msg;
+  alertBox.style.background = type==="error" ? "#ff4d4d" : "#0ff";
+  alertBox.style.color = type==="error" ? "#721c24" : "#0a0a0f";
+  setTimeout(()=> alertBox.style.display="none",3000);
+}
+
+// Update Password
+document.getElementById("updatePasswordBtn").addEventListener("click", ()=>{
+  const np = newPassword.value.trim();
+  const cp = confirmPassword.value.trim();
+  if(np.length<4 || np.length>12) return showAlert("Password must be 4–12 characters","error");
+  if(np!==cp) return showAlert("Passwords do not match","error");
+
+  const storageKey = "LUMIEARN_USER_" + loggedIn.toLowerCase();
+  const userData = JSON.parse(localStorage.getItem(storageKey));
+  userData.password = np;
+  localStorage.setItem(storageKey, JSON.stringify(userData));
+  newPassword.value = ""; 
+  confirmPassword.value = "";
+  showAlert("Password updated successfully!","success");
+});
+</script>
+</body>
+</html>

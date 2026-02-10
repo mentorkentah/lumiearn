@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown | LUMIEARN</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+html, body {
+  margin:0; padding:0; height:100%;
+  font-family: 'Orbitron', sans-serif;
+  background:#0a0a0f; color:#00fff0;
+  overflow-x:hidden;
+}
+
+header {
+  width:100%;
+  background:#111118;
+  padding:15px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 0 20px rgba(0,255,240,0.2);
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:100;
+}
+
+.menu-toggle {
+  position:absolute;
+  left:20px;
+  width:36px; height:36px;
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap:4px;
+  cursor:pointer;
+}
+
+.menu-toggle span {
+  display:block;
+  background:#00fff0;
+  border-radius:4px;
+  width:100%;
+  height:100%;
+  transition:0.3s;
+}
+
+.header-title {
+  font-size:1.8rem;
+  font-weight:700;
+  color:#00fff0;
+  text-align:center;
+}
+
+#aboutPopup {
+  position:absolute;
+  top:55px;
+  left:20px;
+  background:#111118;
+  border:2px solid #00fff0;
+  border-radius:12px;
+  padding:15px 20px;
+  display:none;
+  z-index:200;
+  text-align:left;
+  box-shadow:0 0 30px rgba(0,255,240,0.5);
+  min-width:60px;
+}
+
+#aboutPopup a {
+  color:#00fff0;
+  text-decoration:none;
+  font-size:0.95rem;
+}
+
+#aboutPopup a:hover {
+  text-decoration:underline;
+}
+
+footer {
+  width:100%;
+  text-align:center;
+  padding:12px 0;
+  font-size:14px;
+  background:#111118;
+  color:#00fff0;
+  position:fixed;
+  bottom:0;
+  left:0;
+}
+
+.main-container {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  padding-top:70px;
+  padding-bottom:50px;
+  box-sizing:border-box;
+}
+
+.countdown-container {
+  background:#111118;
+  border: 2px solid #00fff0;
+  border-radius: 24px;
+  padding: 50px 40px;
+  text-align:center;
+  max-width:500px;
+  width:90%;
+  box-shadow:0 0 60px rgba(0,255,240,0.4);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+h1 {
+  font-size:2.5rem;
+  margin-bottom:30px;
+  color:#00fff0;
+  text-shadow:0 0 15px #00fff0;
+}
+
+.timer {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+.time-box {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+  border:2px solid #00fff0;
+  border-radius:12px;
+  min-width:70px;
+  box-shadow:0 0 20px #00fff0;
+}
+
+.time-box .number {
+  font-size:2rem;
+  font-weight:700;
+  text-align:center;
+}
+
+.time-box .label {
+  font-size:0.85rem;
+  margin-top:5px;
+  color:#00fff0;
+  text-align:center;
+}
+
+.separator {
+  font-size:2.5rem;
+  color:#00fff0;
+  margin:0 5px;
+  line-height:1;
+  text-shadow:0 0 15px #00fff0;
+}
+
+.subtitle {
+  margin-top:20px;
+  font-size:1rem;
+  color:#00fff0;
+  text-align:center;
+  text-shadow:0 0 10px #00fff0;
+}
+
+@media(max-width:450px){
+  .timer {gap:6px;}
+  .time-box {min-width:50px; padding:10px;}
+  .time-box .number {font-size:1.5rem;}
+  .time-box .label {font-size:0.7rem;}
+  h1 {font-size:2rem;}
+  #aboutPopup {min-width:140px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="menu-toggle" id="menuToggle">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <div class="header-title">LUMIEARN</div>
+</header>
+
+<div id="aboutPopup">
+  <a href="#AboutSection" onclick="alert('About function triggered!')">About Us</a>
+</div>
+
+<div class="main-container">
+  <div class="countdown-container" id="countdownCard">
+    <h1 id="countdownTitle">Registration Opens In</h1>
+    <div class="timer" id="timerDisplay">
+      <div class="time-box">
+        <span class="number" id="days">00</span>
+        <span class="label">Days</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="time-box">
+        <span class="number" id="hours">00</span>
+        <span class="label">Hours</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="time-box">
+        <span class="number" id="minutes">00</span>
+        <span class="label">Minutes</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="time-box">
+        <span class="number" id="seconds">00</span>
+        <span class="label">Seconds</span>
+      </div>
+    </div>
+    <p class="subtitle" id="countdownSubtitle">Prepare to create your account and start earning!</p>
+  </div>
+</div>
+
+<footer>
+  Copyright © 2026 
+  <strong><a href="#" target="_blank">LUMIEARN</a></strong>. 
+  Designed with ❤️ by 
+  <strong><a href="#" target="_blank">BestChoice Management</a></strong>. 
+  All rights reserved.
+</footer>
+
+<script>
+  // Hamburger popup
+  const menuToggle = document.getElementById("menuToggle");
+  const aboutPopup = document.getElementById("aboutPopup");
+
+  menuToggle.addEventListener("click", () => {
+    aboutPopup.style.display = aboutPopup.style.display === "block" ? "none" : "block";
+  });
+
+  window.addEventListener("click", e => {
+    if(e.target !== menuToggle && !menuToggle.contains(e.target) && !aboutPopup.contains(e.target)){
+      aboutPopup.style.display = "none";
+    }
+  });
+
+  // Countdown Timer (Local Time)
+  // Months are 0-indexed: 0 = January
+  const launchDate = new Date(2026, 1, 28, 12, 00, 0).getTime();
+
+  const daysEl = document.getElementById("days");
+  const hoursEl = document.getElementById("hours");
+  const minutesEl = document.getElementById("minutes");
+  const secondsEl = document.getElementById("seconds");
+  const countdownTitle = document.getElementById("countdownTitle");
+  const countdownSubtitle = document.getElementById("countdownSubtitle");
+  const timerDisplay = document.getElementById("timerDisplay");
+
+  function updateCountdown() {
+    const now = Date.now();
+    const remaining = Math.floor((launchDate - now) / 1000);
+
+    if (remaining <= 0) {
+      countdownTitle.textContent = "Registration Open!";
+      countdownSubtitle.textContent = "Redirecting you to registration...";
+      timerDisplay.style.display = "none";
+
+      // Redirect immediately
+      window.location.href = "register.html";
+      return false;
+    }
+
+    const days = String(Math.floor(remaining / 86400)).padStart(2, "0");
+    const hours = String(Math.floor((remaining % 86400) / 3600)).padStart(2, "0");
+    const minutes = String(Math.floor((remaining % 3600) / 60)).padStart(2, "0");
+    const seconds = String(remaining % 60).padStart(2, "0");
+
+    daysEl.textContent = days;
+    hoursEl.textContent = hours;
+    minutesEl.textContent = minutes;
+    secondsEl.textContent = seconds;
+
+    return true;
+  }
+
+  // Run once immediately, then every second
+  if (updateCountdown()) {
+    setInterval(updateCountdown, 1000);
+  }
+</script>
+</body>
+</html>
